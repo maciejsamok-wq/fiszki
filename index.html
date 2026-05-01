@@ -11,7 +11,7 @@
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icon-192.png" />
   <title>Fiszki ES/PL</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Syne:wght@400;500;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     :root {
       --bg: #0f0f1a;
@@ -119,15 +119,16 @@
     }
     .card.flipped { transform: rotateY(180deg); }
     .face {
-      position: absolute; inset: 0; backface-visibility: hidden;
+      position: absolute; inset: 0;
+      backface-visibility: hidden; -webkit-backface-visibility: hidden;
       border-radius: var(--radius);
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       padding: 28px; border: 1px solid var(--border);
     }
-    .face-front { background: var(--surface); }
+    .face-front { background: var(--surface); transform: rotateY(0deg); }
     .face-back { background: var(--surface2); transform: rotateY(180deg); }
     .face-lang { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 10px; }
-    .face-word { font-size: 34px; font-weight: 800; text-align: center; line-height: 1.1; }
+    .face-word { font-size: 34px; font-weight: 600; text-align: center; line-height: 1.1; font-family: 'Inter', sans-serif; letter-spacing: -0.3px; }
     .face-cat { font-size: 12px; color: var(--muted); margin-top: 10px; }
 
     .fb-row { display: flex; gap: 10px; margin-bottom: 12px; flex-shrink: 0; }
@@ -257,6 +258,10 @@
     }
 
     /* WORD LIST */
+    .cat-check-item { display:flex; align-items:center; gap:8px; padding:7px 10px; background:var(--bg); border:1px solid var(--border); border-radius:10px; cursor:pointer; transition:all 0.15s; }
+    .cat-check-item.selected { border-color:var(--accent); background:rgba(232,197,71,0.08); }
+    .cat-check-item input[type=checkbox] { accent-color:var(--accent); width:16px; height:16px; cursor:pointer; flex-shrink:0; }
+    .cat-check-item span { font-family:'Inter',sans-serif; font-size:14px; color:var(--text); }
     .wlist { display: flex; flex-direction: column; gap: 7px; }
     .witem {
       display: flex; align-items: center;
@@ -361,7 +366,7 @@
   <div class="add-box">
     <div class="field"><label>POLSKI</label><input id="inp-pl" placeholder="np. czerwony" /></div>
     <div class="field"><label>ESPAÑOL</label><input id="inp-es" placeholder="np. rojo" /></div>
-    <div class="field"><label>KATEGORIA</label><select id="inp-sel"></select></div>
+    <div class="field"><label>KATEGORIA (max. 2)</label><div id="inp-cats-check" style="display:flex;flex-direction:column;gap:6px;margin-top:2px"></div></div>
   </div>
   <button class="primary-btn" onclick="addWord()">Dodaj słówko</button>
 
@@ -399,7 +404,8 @@ function load() {
   renderAll();
 }
 
-function fw(cat) { return cat === '__all__' ? data.words : data.words.filter(w => w.cat === cat); }
+function getCats(w) { return Array.isArray(w.cat) ? w.cat : [w.cat]; }
+function fw(cat) { return cat === '__all__' ? data.words : data.words.filter(w => getCats(w).includes(cat)); }
 
 function renderAll() {
   document.getElementById('hcount').textContent = data.words.length + ' słówek';
@@ -442,7 +448,7 @@ function renderFiszki() {
   const w = ws[fIdx];
   document.getElementById('f-front').textContent = w.pl;
   document.getElementById('f-back').textContent = w.es;
-  document.getElementById('f-ctag').textContent = w.cat;
+  document.getElementById('f-ctag').textContent = getCats(w).join(', ');
   document.getElementById('f-ctr').textContent = (fIdx + 1) + ' / ' + ws.length;
   document.getElementById('f-prog').style.width = (((fIdx + 1) / ws.length) * 100) + '%';
   if (fFlipped) { card.classList.add('flipped'); fb.style.display = 'flex'; }
@@ -514,7 +520,7 @@ function renderCatMgmt() {
     return;
   }
   data.cats.forEach((cat, i) => {
-    const count = data.words.filter(w => w.cat === cat).length;
+    const count = data.words.filter(w => getCats(w).includes(cat)).length;
     const el = document.createElement('div');
     el.className = 'cat-mgmt-item';
     el.id = 'cmi-' + i;
@@ -556,7 +562,7 @@ function saveEditCat(i) {
   const oldName = data.cats[i];
   if (!newName || newName === oldName) { cancelEditCat(i, oldName); return; }
   if (data.cats.includes(newName)) { alert('Kategoria o tej nazwie już istnieje.'); return; }
-  data.words.forEach(w => { if (w.cat === oldName) w.cat = newName; });
+  data.words.forEach(w => { const cats = getCats(w); const idx = cats.indexOf(oldName); if (idx !== -1) { cats[idx] = newName; w.cat = cats.length === 1 ? cats[0] : cats; } });
   if (fCat === oldName) fCat = newName;
   if (qCat === oldName) qCat = newName;
   data.cats[i] = newName;
@@ -565,12 +571,17 @@ function saveEditCat(i) {
 
 function deleteCat(i) {
   const cat = data.cats[i];
-  const count = data.words.filter(w => w.cat === cat).length;
+  const count = data.words.filter(w => getCats(w).includes(cat)).length;
   const msg = count > 0
-    ? `Usunąć kategorię "${cat}"?\nZawiera ${count} słówek - one też zostaną usunięte.`
+    ? `Usunąć kategorię "${cat}"?\nZawiera ${count} słówek - zostaną usunięte lub stracą tę kategorię.`
     : `Usunąć kategorię "${cat}"?`;
   if (!confirm(msg)) return;
-  data.words = data.words.filter(w => w.cat !== cat);
+  data.words = data.words.filter(w => {
+    const cats = getCats(w).filter(c => c !== cat);
+    if (!cats.length) return false;
+    w.cat = cats.length === 1 ? cats[0] : cats;
+    return true;
+  });
   data.cats.splice(i, 1);
   if (fCat === cat) { fCat = '__all__'; fIdx = 0; fFlipped = false; }
   if (qCat === cat) qCat = '__all__';
@@ -588,11 +599,14 @@ function addCat() {
 function addWord() {
   const pl = document.getElementById('inp-pl').value.trim();
   const es = document.getElementById('inp-es').value.trim();
-  const cat = document.getElementById('inp-sel').value;
-  if (!pl || !es || !cat) return;
+  const checked = [...document.querySelectorAll('#inp-cats-check input:checked')].map(cb => cb.value);
+  if (!pl || !es || !checked.length) { if (!checked.length) alert('Wybierz co najmniej jedną kategorię.'); return; }
+  const cat = checked.length === 1 ? checked[0] : checked;
   data.words.push({ pl, es, cat }); save();
   document.getElementById('inp-pl').value = '';
   document.getElementById('inp-es').value = '';
+  document.querySelectorAll('#inp-cats-check input').forEach(cb => cb.checked = false);
+  document.querySelectorAll('#inp-cats-check .cat-check-item').forEach(el => el.classList.remove('selected'));
   renderAll();
   document.getElementById('inp-pl').focus();
 }
@@ -605,14 +619,20 @@ function deleteWord(i) {
 }
 
 function renderSelect() {
-  const sel = document.getElementById('inp-sel');
-  const prev = sel.value;
-  sel.innerHTML = '<option value="">-- wybierz kategorię --</option>';
+  const box = document.getElementById('inp-cats-check');
+  const checked = [...document.querySelectorAll('#inp-cats-check input:checked')].map(cb => cb.value);
+  box.innerHTML = '';
   data.cats.forEach(c => {
-    const o = document.createElement('option');
-    o.value = c; o.textContent = c;
-    if (c === prev) o.selected = true;
-    sel.appendChild(o);
+    const item = document.createElement('label');
+    item.className = 'cat-check-item' + (checked.includes(c) ? ' selected' : '');
+    item.innerHTML = `<input type="checkbox" value="${c}" ${checked.includes(c) ? 'checked' : ''} /><span>${c}</span>`;
+    const cb = item.querySelector('input');
+    cb.addEventListener('change', () => {
+      const allChecked = [...document.querySelectorAll('#inp-cats-check input:checked')];
+      if (allChecked.length > 2) { cb.checked = false; return; }
+      item.classList.toggle('selected', cb.checked);
+    });
+    box.appendChild(item);
   });
 }
 
@@ -622,9 +642,11 @@ function renderWordList() {
   lbl.textContent = data.words.length ? 'WSZYSTKIE SŁÓWKA (' + data.words.length + ')' : '';
   list.innerHTML = '';
   data.words.forEach((w, i) => {
+    const cats = getCats(w);
+    const catPills = cats.map(c => '<span class="witem-cat">' + c + '</span>').join('');
     const el = document.createElement('div');
     el.className = 'witem';
-    el.innerHTML = '<span class="witem-pair">' + w.pl + ' → ' + w.es + '</span><span class="witem-cat">' + w.cat + '</span><button class="wdel" onclick="deleteWord(' + i + ')">×</button>';
+    el.innerHTML = '<span class="witem-pair">' + w.pl + ' → ' + w.es + '</span>' + catPills + '<button class="wdel" onclick="deleteWord(' + i + ')">×</button>';
     list.appendChild(el);
   });
 }
