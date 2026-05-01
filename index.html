@@ -148,7 +148,22 @@
     .cat-check-item span{font-family:'Inter',sans-serif;font-size:14px;color:var(--text)}
     .primary-btn{width:100%;padding:13px;border-radius:var(--radius);border:none;background:var(--accent);color:#0f0f1a;font-family:'Inter',sans-serif;font-size:15px;font-weight:800;cursor:pointer;margin-bottom:4px;flex-shrink:0}
     .primary-btn:active{opacity:.85}
-    /* MODAL */
+    /* NAPISZ */
+    .nap-input{flex:1;padding:11px 13px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Inter',sans-serif;font-size:16px;outline:none}
+    .nap-input:focus{border-color:var(--accent)}
+    .nap-input::placeholder{color:var(--muted)}
+    .nap-submit{padding:11px 18px;border-radius:10px;border:1px solid var(--accent);background:transparent;color:var(--accent);font-family:'Inter',sans-serif;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0}
+    .nap-feedback{padding:12px 14px;border-radius:12px;font-size:14px;margin-bottom:12px;flex-shrink:0;line-height:1.5}
+    .nap-feedback.ok{background:rgba(74,222,128,.15);border:1px solid var(--green);color:var(--green)}
+    .nap-feedback.typo{background:rgba(251,146,60,.12);border:1px solid var(--orange);color:var(--orange)}
+    .nap-feedback.wrong{background:rgba(248,113,113,.15);border:1px solid var(--red);color:var(--red)}
+    /* PARY */
+    .pary-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;flex-shrink:0}
+    .par-card{padding:14px 10px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;cursor:pointer;text-align:center;line-height:1.3;transition:all .15s;min-height:56px;display:flex;align-items:center;justify-content:center}
+    .par-card:active{opacity:.8}
+    .par-card.selected{border-color:var(--accent);background:rgba(232,197,71,.12);color:var(--accent)}
+    .par-card.matched{border-color:var(--green);background:rgba(74,222,128,.12);color:var(--green);cursor:default;opacity:.6}
+    .par-card.wrong-flash{border-color:var(--red);background:rgba(248,113,113,.15)}
     .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:flex-end;justify-content:center}
     .modal-overlay.open{display:flex}
     .modal{width:100%;max-width:480px;background:var(--surface);border-radius:var(--radius) var(--radius) 0 0;padding:20px 20px 36px;display:flex;flex-direction:column;gap:14px}
@@ -171,8 +186,7 @@
 
 <div class="tabs">
   <button class="tab active" onclick="switchTab('fiszki')">Fiszki</button>
-  <button class="tab" onclick="switchTab('quiz')">Quiz</button>
-  <button class="tab" onclick="switchTab('przezyj')">Przeżyj</button>
+  <button class="tab" onclick="switchTab('gry')">Quiz</button>
   <button class="tab" onclick="switchTab('slowka')">Słówka</button>
 </div>
 
@@ -208,49 +222,127 @@
   <div class="empty-st" id="f-empty" style="display:none">Brak słówek w tej kategorii</div>
 </div>
 
-<!-- QUIZ -->
-<div class="screen" id="screen-quiz">
-  <div class="sec-lbl">KATEGORIA</div>
-  <div class="cat-bar" id="q-cats"></div>
-  <div class="divider"></div>
-  <div class="prog"><div class="prog-fill" id="q-prog"></div></div>
-  <div id="quiz-main">
-    <div class="quiz-q">
-      <div class="quiz-q-lang">PRZETŁUMACZ NA ESPAÑOL</div>
-      <div class="quiz-q-word" id="q-word">--</div>
-    </div>
-    <div class="opts" id="q-opts"></div>
-    <button class="quiz-next" id="q-next" onclick="nextQ()">Następne &#8594;</button>
+<!-- QUIZ / GRY -->
+<div class="screen" id="screen-gry">
+  <div class="submenu" id="gry-submenu" style="overflow-x:auto;flex-wrap:nowrap;gap:5px">
+    <button class="smtab active" id="gtab-quizpl" onclick="switchGra('quizpl')">PL→ES</button>
+    <button class="smtab" id="gtab-quizes" onclick="switchGra('quizes')">ES→PL</button>
+    <button class="smtab" id="gtab-przezyj" onclick="switchGra('przezyj')">Przeżyj</button>
+    <button class="smtab" id="gtab-napisz" onclick="switchGra('napisz')">Napisz</button>
+    <button class="smtab" id="gtab-pary" onclick="switchGra('pary')">Pary</button>
   </div>
-  <div class="quiz-result" id="quiz-result">
-    <div class="r-score" id="r-score"></div>
-    <div class="r-label" id="r-label"></div>
-    <button class="r-replay" onclick="startQuiz()">Zagraj ponownie</button>
-  </div>
-  <div class="empty-st" id="q-empty" style="display:none">Potrzebujesz minimum 4 słówek</div>
-</div>
 
-<!-- PRZEZYJ -->
-<div class="screen" id="screen-przezyj">
-  <div class="sec-lbl">KATEGORIA</div>
-  <div class="cat-bar" id="p-cats"></div>
-  <div class="divider"></div>
-  <div class="lives-row" id="p-lives"></div>
-  <div class="prog"><div class="prog-fill" id="p-prog"></div></div>
-  <div id="przezyj-main">
-    <div class="quiz-q">
-      <div class="quiz-q-lang">PRZETŁUMACZ NA ESPAÑOL</div>
-      <div class="quiz-q-word" id="p-word">--</div>
+  <!-- QUIZ PL->ES -->
+  <div class="subscreen active" id="gsub-quizpl">
+    <div class="sec-lbl">KATEGORIA</div>
+    <div class="cat-bar" id="q-cats"></div>
+    <div class="divider"></div>
+    <div class="prog"><div class="prog-fill" id="q-prog"></div></div>
+    <div id="quiz-main">
+      <div class="quiz-q">
+        <div class="quiz-q-lang">PRZETŁUMACZ NA ESPAÑOL</div>
+        <div class="quiz-q-word" id="q-word">--</div>
+      </div>
+      <div class="opts" id="q-opts"></div>
+      <button class="quiz-next" id="q-next" onclick="nextQ()">Następne &#8594;</button>
     </div>
-    <div class="opts" id="p-opts"></div>
-    <button class="quiz-next" id="p-next" onclick="nextP()">Następne &#8594;</button>
+    <div class="quiz-result" id="quiz-result">
+      <div class="r-score" id="r-score"></div>
+      <div class="r-label" id="r-label"></div>
+      <button class="r-replay" onclick="startQuiz()">Zagraj ponownie</button>
+    </div>
+    <div class="empty-st" id="q-empty" style="display:none">Potrzebujesz minimum 4 słówek</div>
   </div>
-  <div class="survive-result" id="przezyj-result">
-    <div class="survive-score" id="p-score"></div>
-    <div class="r-label" id="p-label"></div>
-    <button class="r-replay" style="margin-top:8px" onclick="startPrzezyj()">Zagraj ponownie</button>
+
+  <!-- QUIZ ES->PL -->
+  <div class="subscreen" id="gsub-quizes">
+    <div class="sec-lbl">KATEGORIA</div>
+    <div class="cat-bar" id="qr-cats"></div>
+    <div class="divider"></div>
+    <div class="prog"><div class="prog-fill" id="qr-prog"></div></div>
+    <div id="quizr-main">
+      <div class="quiz-q">
+        <div class="quiz-q-lang">PRZETŁUMACZ NA POLSKI</div>
+        <div class="quiz-q-word" id="qr-word">--</div>
+      </div>
+      <div class="opts" id="qr-opts"></div>
+      <button class="quiz-next" id="qr-next" onclick="nextQR()">Następne &#8594;</button>
+    </div>
+    <div class="quiz-result" id="quizr-result">
+      <div class="r-score" id="qr-score"></div>
+      <div class="r-label" id="qr-label"></div>
+      <button class="r-replay" onclick="startQuizR()">Zagraj ponownie</button>
+    </div>
+    <div class="empty-st" id="qr-empty" style="display:none">Potrzebujesz minimum 4 słówek</div>
   </div>
-  <div class="empty-st" id="p-empty" style="display:none">Potrzebujesz minimum 4 słówek</div>
+
+  <!-- PRZEZYJ -->
+  <div class="subscreen" id="gsub-przezyj">
+    <div class="sec-lbl">KATEGORIA</div>
+    <div class="cat-bar" id="p-cats"></div>
+    <div class="divider"></div>
+    <div class="lives-row" id="p-lives"></div>
+    <div class="prog"><div class="prog-fill" id="p-prog"></div></div>
+    <div id="przezyj-main">
+      <div class="quiz-q">
+        <div class="quiz-q-lang" id="p-qlang">PRZETŁUMACZ NA ESPAÑOL</div>
+        <div class="quiz-q-word" id="p-word">--</div>
+      </div>
+      <div style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:10px;flex-shrink:0">20 najtrudniejszych słówek</div>
+      <div class="opts" id="p-opts"></div>
+      <button class="quiz-next" id="p-next" onclick="nextP()">Następne &#8594;</button>
+    </div>
+    <div class="survive-result" id="przezyj-result">
+      <div class="survive-score" id="p-score"></div>
+      <div class="r-label" id="p-label"></div>
+      <button class="r-replay" style="margin-top:8px" onclick="startPrzezyj()">Zagraj ponownie</button>
+    </div>
+    <div class="empty-st" id="p-empty" style="display:none">Potrzebujesz minimum 4 słówek</div>
+  </div>
+
+  <!-- NAPISZ -->
+  <div class="subscreen" id="gsub-napisz">
+    <div class="sec-lbl">KATEGORIA</div>
+    <div class="cat-bar" id="nap-cats"></div>
+    <div class="divider"></div>
+    <div class="prog"><div class="prog-fill" id="nap-prog"></div></div>
+    <div id="napisz-main">
+      <div class="quiz-q">
+        <div class="quiz-q-lang">WPISZ PO HISZPAŃSKU</div>
+        <div class="quiz-q-word" id="nap-word">--</div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-shrink:0">
+        <input id="nap-inp" class="nap-input" placeholder="napisz po hiszpańsku..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+        <button class="nap-submit" onclick="checkNapisz()">OK</button>
+      </div>
+      <div id="nap-feedback" class="nap-feedback" style="display:none"></div>
+      <button class="quiz-next" id="nap-next" onclick="nextNapisz()" style="display:none">Następne &#8594;</button>
+    </div>
+    <div class="quiz-result" id="napisz-result">
+      <div class="r-score" id="nap-score"></div>
+      <div class="r-label" id="nap-label"></div>
+      <button class="r-replay" onclick="startNapisz()">Zagraj ponownie</button>
+    </div>
+    <div class="empty-st" id="nap-empty" style="display:none">Potrzebujesz minimum 2 słówek</div>
+  </div>
+
+  <!-- PARY -->
+  <div class="subscreen" id="gsub-pary">
+    <div class="sec-lbl">KATEGORIA</div>
+    <div class="cat-bar" id="par-cats"></div>
+    <div class="divider"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-shrink:0">
+      <div style="font-size:13px;color:var(--muted)" id="par-status">Wybierz dwie pasujące karty</div>
+      <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)" id="par-pairs">0/0</div>
+    </div>
+    <div class="pary-grid" id="par-grid"></div>
+    <div class="quiz-result" id="pary-result">
+      <div class="r-score" id="par-score"></div>
+      <div class="r-label" id="par-label"></div>
+      <button class="r-replay" onclick="startPary()">Zagraj ponownie</button>
+    </div>
+    <div class="empty-st" id="par-empty" style="display:none">Potrzebujesz minimum 4 słówek</div>
+  </div>
 </div>
 
 <!-- SLOWKA -->
@@ -405,23 +497,24 @@ function renderAll(){
 }
 
 // CAT BARS
-let fCat='__all__',qCat='__all__',pCat='__all__';
+let fCat='__all__',qCat='__all__',qrCat='__all__',pCat='__all__',napCat='__all__',parCat='__all__';
 function renderCatBars(){
   [['f',()=>fCat,v=>{fCat=v;fIdx=0;fFlipped=false;},renderFiszki],
    ['q',()=>qCat,v=>{qCat=v;},startQuiz],
-   ['p',()=>pCat,v=>{pCat=v;},startPrzezyj]
+   ['qr',()=>qrCat,v=>{qrCat=v;},startQuizR],
+   ['p',()=>pCat,v=>{pCat=v;},startPrzezyj],
+   ['nap',()=>napCat,v=>{napCat=v;},startNapisz],
+   ['par',()=>parCat,v=>{parCat=v;},startPary],
   ].forEach(([prefix,getAc,setAc,onSelect])=>{
-    const bar=document.getElementById(prefix+'-cats'),ac=getAc();
-    bar.innerHTML='';
+    const bar=document.getElementById(prefix+'-cats');if(!bar)return;
+    const ac=getAc();bar.innerHTML='';
     const all=document.createElement('button');
-    all.className='cat-pill'+(ac==='__all__'?' active':'');
-    all.textContent='Wszystkie';
+    all.className='cat-pill'+(ac==='__all__'?' active':'');all.textContent='Wszystkie';
     all.onclick=()=>{setAc('__all__');renderAll();onSelect();};
     bar.appendChild(all);
     data.cats.forEach(cat=>{
       const btn=document.createElement('button');
-      btn.className='cat-pill'+(ac===cat?' active':'');
-      btn.textContent=cat;
+      btn.className='cat-pill'+(ac===cat?' active':'');btn.textContent=cat;
       btn.onclick=()=>{setAc(cat);renderAll();onSelect();};
       bar.appendChild(btn);
     });
@@ -449,63 +542,95 @@ function cardFb(){fFlipped=false;nextCard();}
 function nextCard(){fFlipped=false;const ws=fw(fCat,true);fIdx=(fIdx+1)%ws.length;renderFiszki();}
 function prevCard(){fFlipped=false;const ws=fw(fCat,true);fIdx=(fIdx-1+ws.length)%ws.length;renderFiszki();}
 
-// QUIZ
-let qOrder=[],qIdx=0,qCorrect=0,qAnswered=false;
+// QUIZ PL->ES
+let qOrder=[],qIdx=0,qCorrect=0;
 function startQuiz(){
   const ws=srSort(fw(qCat));
   const empty=document.getElementById('q-empty'),main=document.getElementById('quiz-main'),result=document.getElementById('quiz-result');
   result.style.display='none';main.style.display='';
   if(ws.length<4){empty.style.display='flex';main.style.display='none';return;}
   empty.style.display='none';
-  qOrder=ws.map((_,i)=>i);qIdx=0;qCorrect=0;qAnswered=false;
-  renderQ(ws);
+  qOrder=ws.map((_,i)=>i);qIdx=0;qCorrect=0;renderQ(ws);
 }
 function renderQ(ws){
   if(!ws)ws=srSort(fw(qCat));
-  if(qIdx>=qOrder.length){showQuizResult(qOrder.length);return;}
+  if(qIdx>=qOrder.length){
+    document.getElementById('quiz-main').style.display='none';
+    const r=document.getElementById('quiz-result');r.style.display='flex';
+    const p=Math.round((qCorrect/qOrder.length)*100);
+    document.getElementById('r-score').textContent=qCorrect+'/'+qOrder.length;
+    document.getElementById('r-label').textContent=p+'% — '+(p>=80?'Świetnie!':p>=50?'Nieźle!':'Ćwicz dalej!');
+    return;
+  }
   document.getElementById('q-prog').style.width=((qIdx/qOrder.length)*100)+'%';
   const w=ws[qOrder[qIdx]];
   document.getElementById('q-word').textContent=w.pl;
   const dis=ws.filter((_,i)=>i!==qOrder[qIdx]).sort(()=>Math.random()-.5).slice(0,3);
-  buildOpts(document.getElementById('q-opts'),[...dis,w].sort(()=>Math.random()-.5),w,(correct)=>{
-    srUpdate(w,correct);if(correct)qCorrect++;
-    document.getElementById('q-next').style.display='block';qAnswered=true;
+  buildOpts(document.getElementById('q-opts'),[...dis,w].sort(()=>Math.random()-.5),w,'es',(ok)=>{
+    srUpdate(w,ok);if(ok)qCorrect++;document.getElementById('q-next').style.display='block';
   });
-  document.getElementById('q-next').style.display='none';qAnswered=false;
+  document.getElementById('q-next').style.display='none';
 }
 function nextQ(){qIdx++;renderQ();}
-function showQuizResult(total){
-  document.getElementById('q-prog').style.width='100%';
-  document.getElementById('quiz-main').style.display='none';
-  const result=document.getElementById('quiz-result');result.style.display='flex';
-  const p=Math.round((qCorrect/total)*100);
-  document.getElementById('r-score').textContent=qCorrect+'/'+total;
-  document.getElementById('r-label').textContent=p+'% poprawnych — '+(p>=80?'Świetnie!':p>=50?'Nieźle, ćwicz dalej!':'Trzeba pouczyć!');
-}
 
-function buildOpts(grid,opts,correct,onAnswer){
+// QUIZ ES->PL
+let qrOrder=[],qrIdx=0,qrCorrect=0;
+function startQuizR(){
+  const ws=srSort(fw(qrCat));
+  const empty=document.getElementById('qr-empty'),main=document.getElementById('quizr-main'),result=document.getElementById('quizr-result');
+  result.style.display='none';main.style.display='';
+  if(ws.length<4){empty.style.display='flex';main.style.display='none';return;}
+  empty.style.display='none';
+  qrOrder=ws.map((_,i)=>i);qrIdx=0;qrCorrect=0;renderQR(ws);
+}
+function renderQR(ws){
+  if(!ws)ws=srSort(fw(qrCat));
+  if(qrIdx>=qrOrder.length){
+    document.getElementById('quizr-main').style.display='none';
+    const r=document.getElementById('quizr-result');r.style.display='flex';
+    const p=Math.round((qrCorrect/qrOrder.length)*100);
+    document.getElementById('qr-score').textContent=qrCorrect+'/'+qrOrder.length;
+    document.getElementById('qr-label').textContent=p+'% — '+(p>=80?'Świetnie!':p>=50?'Nieźle!':'Ćwicz dalej!');
+    return;
+  }
+  document.getElementById('qr-prog').style.width=((qrIdx/qrOrder.length)*100)+'%';
+  const w=ws[qrOrder[qrIdx]];
+  document.getElementById('qr-word').textContent=w.es;
+  const dis=ws.filter((_,i)=>i!==qrOrder[qrIdx]).sort(()=>Math.random()-.5).slice(0,3);
+  buildOpts(document.getElementById('qr-opts'),[...dis,w].sort(()=>Math.random()-.5),w,'pl',(ok)=>{
+    srUpdate(w,ok);if(ok)qrCorrect++;document.getElementById('qr-next').style.display='block';
+  });
+  document.getElementById('qr-next').style.display='none';
+}
+function nextQR(){qrIdx++;renderQR();}
+
+function buildOpts(grid,opts,correct,field,onAnswer){
   grid.innerHTML='';
   opts.forEach(o=>{
-    const b=document.createElement('button');b.className='opt';b.textContent=o.es;
+    const b=document.createElement('button');b.className='opt';b.textContent=o[field];
     b.onclick=()=>{
       if(b.disabled)return;
-      grid.querySelectorAll('.opt').forEach(x=>{x.disabled=true;if(x.textContent===correct.es)x.classList.add('correct');});
-      const ok=o.es===correct.es;if(!ok)b.classList.add('wrong');
+      grid.querySelectorAll('.opt').forEach(x=>{x.disabled=true;if(x.textContent===correct[field])x.classList.add('correct');});
+      const ok=o[field]===correct[field];if(!ok)b.classList.add('wrong');
       onAnswer(ok);
     };
     grid.appendChild(b);
   });
 }
 
-// PRZEZYJ
-let pOrder=[],pIdx=0,pLives=3,pScore=0,pAnswered=false;
+// PRZEZYJ - 20 najtrudniejszych
+let pOrder=[],pIdx=0,pLives=3,pScore=0;
+function worstWords(cat){
+  const ws=fw(cat);
+  return[...ws].sort((a,b)=>(pct(a)??-1)-(pct(b)??-1)).slice(0,20);
+}
 function startPrzezyj(){
-  const ws=srSort(fw(pCat));
+  const ws=worstWords(pCat);
   const empty=document.getElementById('p-empty'),main=document.getElementById('przezyj-main'),result=document.getElementById('przezyj-result');
   result.style.display='none';main.style.display='';
   if(ws.length<4){empty.style.display='flex';main.style.display='none';return;}
   empty.style.display='none';
-  pOrder=ws.map((_,i)=>i);pIdx=0;pLives=3;pScore=0;pAnswered=false;
+  pOrder=ws.map((_,i)=>i);pIdx=0;pLives=3;pScore=0;
   renderLives();renderP(ws);
 }
 function renderLives(){
@@ -513,31 +638,166 @@ function renderLives(){
   for(let i=0;i<3;i++){const s=document.createElement('span');s.className='life'+(i>=pLives?' lost':'');s.textContent='❤️';row.appendChild(s);}
 }
 function renderP(ws){
-  if(!ws)ws=srSort(fw(pCat));
+  if(!ws)ws=worstWords(pCat);
   if(pIdx>=pOrder.length){endPrzezyj(true,pScore);return;}
   document.getElementById('p-prog').style.width=((pIdx/pOrder.length)*100)+'%';
   const w=ws[pOrder[pIdx]];
   document.getElementById('p-word').textContent=w.pl;
   const dis=ws.filter((_,i)=>i!==pOrder[pIdx]).sort(()=>Math.random()-.5).slice(0,3);
-  buildOpts(document.getElementById('p-opts'),[...dis,w].sort(()=>Math.random()-.5),w,(correct)=>{
-    srUpdate(w,correct);
-    if(correct){pScore++;}
+  buildOpts(document.getElementById('p-opts'),[...dis,w].sort(()=>Math.random()-.5),w,'es',(ok)=>{
+    srUpdate(w,ok);
+    if(ok){pScore++;}
     else{pLives--;renderLives();if(pLives<=0){setTimeout(()=>endPrzezyj(false,pScore),900);return;}}
-    document.getElementById('p-next').style.display='block';pAnswered=true;
+    document.getElementById('p-next').style.display='block';
   });
-  document.getElementById('p-next').style.display='none';pAnswered=false;
+  document.getElementById('p-next').style.display='none';
 }
 function nextP(){pIdx++;renderP();}
 function endPrzezyj(won,score){
   document.getElementById('przezyj-main').style.display='none';
-  const result=document.getElementById('przezyj-result');result.style.display='flex';
+  const r=document.getElementById('przezyj-result');r.style.display='flex';
   const el=document.getElementById('p-score');
   el.textContent=won?score+'✓':score+'✗';
   el.className='survive-score '+(won?'win':'lose');
   document.getElementById('p-label').textContent=won?'Przeżyłeś! Wszystkie '+score+' słówek!':'Koniec gry! '+score+' słówek bez błędu.';
 }
 
-// SLOWKA TAB
+// NAPISZ
+let napOrder=[],napIdx=0,napCorrect=0;
+function startNapisz(){
+  const ws=srSort(fw(napCat));
+  const empty=document.getElementById('nap-empty'),main=document.getElementById('napisz-main'),result=document.getElementById('napisz-result');
+  result.style.display='none';main.style.display='';
+  if(ws.length<2){empty.style.display='flex';main.style.display='none';return;}
+  empty.style.display='none';
+  napOrder=ws.map((_,i)=>i);napIdx=0;napCorrect=0;renderNapisz(ws);
+}
+function normalize(s){return s.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
+function levenshtein(a,b){
+  const m=a.length,n=b.length;
+  const dp=Array.from({length:m+1},(_,i)=>Array.from({length:n+1},(_,j)=>i===0?j:j===0?i:0));
+  for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)dp[i][j]=a[i-1]===b[j-1]?dp[i-1][j-1]:1+Math.min(dp[i-1][j],dp[i][j-1],dp[i-1][j-1]);
+  return dp[m][n];
+}
+function renderNapisz(ws){
+  if(!ws)ws=srSort(fw(napCat));
+  const fb=document.getElementById('nap-feedback'),next=document.getElementById('nap-next');
+  if(napIdx>=napOrder.length){
+    document.getElementById('napisz-main').style.display='none';
+    const r=document.getElementById('napisz-result');r.style.display='flex';
+    const p=Math.round((napCorrect/napOrder.length)*100);
+    document.getElementById('nap-score').textContent=napCorrect+'/'+napOrder.length;
+    document.getElementById('nap-label').textContent=p+'% poprawnych — '+(p>=80?'Świetnie!':p>=50?'Nieźle!':'Ćwicz dalej!');
+    return;
+  }
+  document.getElementById('nap-prog').style.width=((napIdx/napOrder.length)*100)+'%';
+  document.getElementById('nap-word').textContent=ws[napOrder[napIdx]].pl;
+  document.getElementById('nap-inp').value='';
+  fb.style.display='none';next.style.display='none';
+  document.getElementById('nap-inp').disabled=false;
+  setTimeout(()=>document.getElementById('nap-inp').focus(),50);
+}
+function checkNapisz(){
+  const ws=srSort(fw(napCat));
+  const w=ws[napOrder[napIdx]];
+  const input=document.getElementById('nap-inp').value.trim();
+  if(!input)return;
+  document.getElementById('nap-inp').disabled=true;
+  const fb=document.getElementById('nap-feedback');fb.style.display='block';
+  const correct=w.es;
+  const dist=levenshtein(normalize(input),normalize(correct));
+  let ok=false;
+  if(normalize(input)===normalize(correct)){
+    fb.className='nap-feedback ok';fb.textContent='✓ Dobrze! '+correct;ok=true;
+  } else if(dist<=2&&dist<normalize(correct).length*0.35){
+    fb.className='nap-feedback typo';fb.innerHTML='～ Prawie! Poprawnie: <strong>'+correct+'</strong>';ok=true;
+  } else {
+    fb.className='nap-feedback wrong';fb.innerHTML='✗ Błąd. Poprawnie: <strong>'+correct+'</strong>';
+  }
+  srUpdate(w,ok);if(ok)napCorrect++;
+  document.getElementById('nap-next').style.display='block';
+}
+function nextNapisz(){napIdx++;renderNapisz();}
+
+// PARY
+let parSelected=null,parMatched=0,parTotal=0,parMoves=0;
+function startPary(){
+  const all=fw(parCat,false);
+  const ws=all.sort(()=>Math.random()-.5).slice(0,8);
+  const empty=document.getElementById('par-empty'),grid=document.getElementById('par-grid'),result=document.getElementById('pary-result');
+  result.style.display='none';grid.style.display='';
+  if(all.length<4){empty.style.display='flex';grid.style.display='none';return;}
+  empty.style.display='none';
+  parSelected=null;parMatched=0;parTotal=ws.length;parMoves=0;
+  document.getElementById('par-pairs').textContent='0/'+parTotal;
+  document.getElementById('par-status').textContent='Wybierz dwie pasujące karty';
+  const cards=[...ws.map(w=>({id:w.pl+'|'+w.es,text:w.pl,type:'pl',word:w})),...ws.map(w=>({id:w.pl+'|'+w.es,text:w.es,type:'es',word:w}))];
+  cards.sort(()=>Math.random()-.5);
+  grid.innerHTML='';
+  cards.forEach((c)=>{
+    const el=document.createElement('div');
+    el.className='par-card';el.textContent=c.text;el.dataset.id=c.id;el.dataset.type=c.type;
+    el.onclick=()=>selectPar(el,c);
+    grid.appendChild(el);
+  });
+}
+function selectPar(el,card){
+  if(el.classList.contains('matched')||el.classList.contains('selected'))return;
+  el.classList.add('selected');
+  if(!parSelected){parSelected={el,card};return;}
+  parMoves++;
+  const prev=parSelected;parSelected=null;
+  if(prev.card.id===card.id&&prev.card.type!==card.type){
+    prev.el.classList.remove('selected');el.classList.remove('selected');
+    prev.el.classList.add('matched');el.classList.add('matched');
+    parMatched++;
+    document.getElementById('par-pairs').textContent=parMatched+'/'+parTotal;
+    document.getElementById('par-status').textContent=parMatched===parTotal?'Wszystkie pary! 🎉':'Dobra para! ✓';
+    if(parMatched===parTotal){
+      setTimeout(()=>{
+        document.getElementById('par-grid').style.display='none';
+        const r=document.getElementById('pary-result');r.style.display='flex';
+        document.getElementById('par-score').textContent=parMoves+'🎯';
+        document.getElementById('par-label').textContent='ruchów — '+(parMoves<=parTotal+2?'Rewelacja!':parMoves<=parTotal*2?'Nieźle!':'Ćwicz pamięć!');
+      },600);
+    }
+  } else {
+    prev.el.classList.add('wrong-flash');el.classList.add('wrong-flash');
+    document.getElementById('par-status').textContent='Nie pasuje, spróbuj jeszcze raz';
+    setTimeout(()=>{prev.el.classList.remove('selected','wrong-flash');el.classList.remove('selected','wrong-flash');},700);
+  }
+}
+
+// TAB SWITCH
+function switchTab(name){
+  ['fiszki','gry','slowka'].forEach((n,i)=>{
+    document.querySelectorAll('.tab')[i].classList.toggle('active',n===name);
+    document.getElementById('screen-'+n).classList.toggle('active',n===name);
+  });
+  if(name==='gry')switchGra('quizpl');
+  if(name==='fiszki')renderFiszki();
+  if(name==='slowka')switchSub('wszystkie');
+}
+
+function switchGra(name){
+  ['quizpl','quizes','przezyj','napisz','pary'].forEach(n=>{
+    document.getElementById('gtab-'+n).classList.toggle('active',n===name);
+    document.getElementById('gsub-'+n).classList.toggle('active',n===name);
+  });
+  if(name==='quizpl')startQuiz();
+  if(name==='quizes')startQuizR();
+  if(name==='przezyj')startPrzezyj();
+  if(name==='napisz')startNapisz();
+  if(name==='pary')startPary();
+}
+
+document.getElementById('inp-pl').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('inp-es').focus();});
+document.getElementById('inp-es').addEventListener('keydown',e=>{if(e.key==='Enter')addWord();});
+document.getElementById('inp-cat').addEventListener('keydown',e=>{if(e.key==='Enter')addCat();});
+document.getElementById('nap-inp').addEventListener('keydown',e=>{if(e.key==='Enter')checkNapisz();});
+
+load();
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
 let showLearned=false,detailIdx=-1;
 function switchSub(name){
   const tabs=document.querySelectorAll('.smtab');
@@ -625,7 +885,8 @@ function saveEditCat(i){
   if(!newName||newName===oldName){cancelEditCat(i,oldName);return;}
   if(data.cats.includes(newName)){alert('Kategoria o tej nazwie już istnieje.');return;}
   data.words.forEach(w=>{const cats=getCats(w);const idx=cats.indexOf(oldName);if(idx!==-1){cats[idx]=newName;w.cat=cats.length===1?cats[0]:cats;}});
-  if(fCat===oldName)fCat=newName;if(qCat===oldName)qCat=newName;if(pCat===oldName)pCat=newName;
+  if(fCat===oldName)fCat=newName;if(qCat===oldName)qCat=newName;if(qrCat===oldName)qrCat=newName;
+  if(pCat===oldName)pCat=newName;if(napCat===oldName)napCat=newName;if(parCat===oldName)parCat=newName;
   data.cats[i]=newName;save();renderAll();
 }
 function deleteCat(i){
@@ -705,21 +966,11 @@ function deleteFromDetail(){
   data.words.splice(detailIdx,1);save();renderAll();closeDetail();
 }
 
-// TAB SWITCH
-function switchTab(name){
-  ['fiszki','quiz','przezyj','slowka'].forEach((n,i)=>{
-    document.querySelectorAll('.tab')[i].classList.toggle('active',n===name);
-    document.getElementById('screen-'+n).classList.toggle('active',n===name);
-  });
-  if(name==='quiz')startQuiz();
-  if(name==='przezyj')startPrzezyj();
-  if(name==='fiszki')renderFiszki();
-  if(name==='slowka'){switchSub('wszystkie');}
-}
-
+// TAB SWITCH - handled above
 document.getElementById('inp-pl').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('inp-es').focus();});
 document.getElementById('inp-es').addEventListener('keydown',e=>{if(e.key==='Enter')addWord();});
 document.getElementById('inp-cat').addEventListener('keydown',e=>{if(e.key==='Enter')addCat();});
+document.getElementById('nap-inp').addEventListener('keydown',e=>{if(e.key==='Enter')checkNapisz();});
 
 load();
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
