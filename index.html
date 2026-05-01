@@ -11,331 +11,174 @@
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icon-192.png" />
   <title>Fiszki ES/PL</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Syne:wght@400;500;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #0f0f1a;
-      --surface: #1a1a2e;
-      --surface2: #22223b;
-      --accent: #e8c547;
-      --text: #f0ede8;
-      --muted: #888899;
-      --border: rgba(255,255,255,0.08);
-      --green: #4ade80;
-      --red: #f87171;
-      --radius: 16px;
+      --bg:#0f0f1a;--surface:#1a1a2e;--surface2:#22223b;
+      --accent:#e8c547;--text:#f0ede8;--muted:#888899;
+      --border:rgba(255,255,255,0.08);--green:#4ade80;--red:#f87171;--orange:#fb923c;--radius:16px;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    html, body { height: 100%; overflow: hidden; background: var(--bg); }
-    body {
-      font-family: 'Syne', sans-serif;
-      color: var(--text);
-      display: flex;
-      flex-direction: column;
-      max-width: 480px;
-      margin: 0 auto;
-    }
-
-    .header {
-      padding: 48px 20px 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-shrink: 0;
-    }
-    .header-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
-    .header-title span { color: var(--accent); }
-    .header-count {
-      font-family: 'DM Mono', monospace;
-      font-size: 12px;
-      color: var(--muted);
-      background: var(--surface);
-      padding: 4px 10px;
-      border-radius: 20px;
-      border: 1px solid var(--border);
-    }
-
-    .tabs {
-      display: flex;
-      gap: 6px;
-      padding: 0 20px 14px;
-      flex-shrink: 0;
-    }
-    .tab {
-      flex: 1;
-      padding: 9px 6px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--muted);
-      font-family: 'Syne', sans-serif;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .tab.active { background: var(--accent); color: #0f0f1a; border-color: var(--accent); font-weight: 700; }
-
-    .screen { display: none; flex: 1; overflow-y: auto; padding: 0 20px 24px; flex-direction: column; }
-    .screen.active { display: flex; }
-    .screen::-webkit-scrollbar { width: 0; }
-
-    .sec-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 10px;
-      letter-spacing: 0.1em;
-      color: var(--muted);
-      margin-bottom: 8px;
-    }
-
-    /* CAT PILLS */
-    .cat-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
-    .cat-pill {
-      padding: 5px 13px;
-      border-radius: 20px;
-      border: 1px solid var(--border);
-      background: transparent;
-      font-family: 'Syne', sans-serif;
-      font-size: 13px;
-      color: var(--muted);
-      cursor: pointer;
-      transition: all 0.15s;
-      white-space: nowrap;
-    }
-    .cat-pill.active { background: var(--accent); color: #0f0f1a; border-color: var(--accent); font-weight: 700; }
-
-    /* PROGRESS */
-    .prog { height: 2px; background: var(--border); border-radius: 2px; margin-bottom: 14px; flex-shrink: 0; }
-    .prog-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.35s; }
-
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    html,body{height:100%;overflow:hidden;background:var(--bg)}
+    body{font-family:'Inter',sans-serif;color:var(--text);display:flex;flex-direction:column;max-width:480px;margin:0 auto}
+    .header{padding:48px 20px 10px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+    .header-title{font-size:22px;font-weight:700;letter-spacing:-0.5px}
+    .header-title span{color:var(--accent)}
+    .hbadge{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);background:var(--surface);padding:4px 10px;border-radius:20px;border:1px solid var(--border)}
+    .tabs{display:flex;gap:5px;padding:0 20px 12px;flex-shrink:0}
+    .tab{flex:1;padding:9px 4px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Inter',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s}
+    .tab.active{background:var(--accent);color:#0f0f1a;border-color:var(--accent);font-weight:700}
+    .screen{display:none;flex:1;overflow-y:auto;padding:0 20px 24px;flex-direction:column}
+    .screen.active{display:flex}
+    .screen::-webkit-scrollbar{width:0}
+    .sec-lbl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;color:var(--muted);margin-bottom:8px;flex-shrink:0}
+    .divider{height:1px;background:var(--border);margin:4px 0 14px;flex-shrink:0}
+    .prog{height:2px;background:var(--border);border-radius:2px;margin-bottom:14px;flex-shrink:0}
+    .prog-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .35s}
+    .empty-st{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;font-size:14px;color:var(--muted);padding:40px 20px}
+    .cat-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;flex-shrink:0}
+    .cat-pill{padding:5px 13px;border-radius:20px;border:1px solid var(--border);background:transparent;font-family:'Inter',sans-serif;font-size:13px;color:var(--muted);cursor:pointer;transition:all .15s;white-space:nowrap}
+    .cat-pill.active{background:var(--accent);color:#0f0f1a;border-color:var(--accent);font-weight:700}
     /* CARD */
-    .card-tap { text-align: center; font-size: 12px; color: var(--muted); margin-bottom: 10px; }
-    .card-scene { perspective: 1100px; margin-bottom: 14px; flex-shrink: 0; }
-    .card {
-      width: 100%; height: 220px;
-      position: relative; transform-style: preserve-3d;
-      transition: transform 0.48s cubic-bezier(.4,0,.2,1);
-      cursor: pointer; border-radius: var(--radius);
-    }
-    .card.flipped { transform: rotateY(180deg); }
-    .face {
-      position: absolute; inset: 0;
-      backface-visibility: hidden; -webkit-backface-visibility: hidden;
-      border-radius: var(--radius);
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      padding: 28px; border: 1px solid var(--border);
-    }
-    .face-front { background: var(--surface); transform: rotateY(0deg); }
-    .face-back { background: var(--surface2); transform: rotateY(180deg); }
-    .face-lang { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 10px; }
-    .face-word { font-size: 34px; font-weight: 600; text-align: center; line-height: 1.1; font-family: 'Inter', sans-serif; letter-spacing: -0.3px; }
-    .face-cat { font-size: 12px; color: var(--muted); margin-top: 10px; }
-
-    .fb-row { display: flex; gap: 10px; margin-bottom: 12px; flex-shrink: 0; }
-    .fb-btn {
-      flex: 1; padding: 13px;
-      border-radius: var(--radius); border: 1px solid var(--border);
-      background: var(--surface);
-      font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer;
-    }
-    .fb-no { color: var(--red); }
-    .fb-no:active { background: rgba(248,113,113,0.15); }
-    .fb-yes { color: var(--green); }
-    .fb-yes:active { background: rgba(74,222,128,0.15); }
-
-    .nav-row { display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
-    .nav-btn {
-      padding: 10px 22px; border-radius: 10px;
-      border: 1px solid var(--border); background: var(--surface);
-      color: var(--text); font-family: 'Syne', sans-serif; font-size: 14px; cursor: pointer;
-    }
-    .nav-btn:active { opacity: 0.7; }
-    .nav-ctr { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--muted); }
-
+    .card-tap{text-align:center;font-size:12px;color:var(--muted);margin-bottom:10px;flex-shrink:0}
+    .card-scene{perspective:1100px;margin-bottom:14px;flex-shrink:0}
+    .card{width:100%;height:220px;position:relative;transform-style:preserve-3d;transition:transform .48s cubic-bezier(.4,0,.2,1);cursor:pointer;border-radius:var(--radius)}
+    .card.flipped{transform:rotateY(180deg)}
+    .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:var(--radius);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;border:1px solid var(--border)}
+    .face-front{background:var(--surface);transform:rotateY(0deg)}
+    .face-back{background:var(--surface2);transform:rotateY(180deg)}
+    .face-lang{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;color:var(--accent);margin-bottom:10px}
+    .face-word{font-size:34px;font-weight:600;text-align:center;line-height:1.1;letter-spacing:-.3px}
+    .face-cat{font-size:12px;color:var(--muted);margin-top:10px}
+    .fb-row{display:flex;gap:10px;margin-bottom:12px;flex-shrink:0}
+    .fb-btn{flex:1;padding:13px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);font-family:'Inter',sans-serif;font-size:14px;font-weight:700;cursor:pointer}
+    .fb-no{color:var(--red)}.fb-no:active{background:rgba(248,113,113,.15)}
+    .fb-yes{color:var(--green)}.fb-yes:active{background:rgba(74,222,128,.15)}
+    .nav-row{display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+    .nav-btn{padding:10px 22px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;cursor:pointer}
+    .nav-btn:active{opacity:.7}
+    .nav-ctr{font-family:'DM Mono',monospace;font-size:13px;color:var(--muted)}
     /* QUIZ */
-    .quiz-q {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 28px 20px;
-      text-align: center; margin-bottom: 14px; flex-shrink: 0;
-    }
-    .quiz-q-lang { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 10px; }
-    .quiz-q-word { font-size: 30px; font-weight: 800; }
-    .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; flex-shrink: 0; }
-    .opt {
-      padding: 15px 10px; border-radius: var(--radius);
-      border: 1px solid var(--border); background: var(--surface);
-      color: var(--text); font-family: 'Syne', sans-serif; font-size: 14px;
-      cursor: pointer; text-align: center; line-height: 1.3; transition: all 0.15s;
-    }
-    .opt:active:not(:disabled) { opacity: 0.8; }
-    .opt.correct { background: rgba(74,222,128,0.15); border-color: var(--green); color: var(--green); }
-    .opt.wrong { background: rgba(248,113,113,0.15); border-color: var(--red); color: var(--red); }
-    .opt:disabled { cursor: default; }
-    .quiz-next {
-      width: 100%; padding: 13px; border-radius: var(--radius);
-      border: 1px solid var(--accent); background: transparent;
-      color: var(--accent); font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
-      cursor: pointer; display: none; flex-shrink: 0;
-    }
-    .quiz-result {
-      display: none; flex-direction: column; align-items: center;
-      justify-content: center; flex: 1; text-align: center; gap: 10px;
-    }
-    .r-score { font-size: 60px; font-weight: 800; color: var(--accent); line-height: 1; }
-    .r-label { font-size: 14px; color: var(--muted); }
-    .r-replay {
-      margin-top: 8px; padding: 12px 32px; border-radius: var(--radius);
-      border: 1px solid var(--accent); background: transparent;
-      color: var(--accent); font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer;
-    }
-
-    /* DODAJ */
-    .add-box {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 16px; margin-bottom: 12px; flex-shrink: 0;
-    }
-    .field { margin-bottom: 12px; }
-    .field:last-child { margin-bottom: 0; }
-    .field label { display: block; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 5px; }
-    .field input, .field select {
-      width: 100%; padding: 11px 13px;
-      background: var(--bg); border: 1px solid var(--border);
-      border-radius: 10px; color: var(--text);
-      font-family: 'Syne', sans-serif; font-size: 15px; outline: none;
-    }
-    .field input:focus, .field select:focus { border-color: var(--accent); }
-    .field input::placeholder { color: var(--muted); }
-    .field select { cursor: pointer; }
-    .field select option { background: var(--surface); }
-    .primary-btn {
-      width: 100%; padding: 13px; border-radius: var(--radius);
-      border: none; background: var(--accent); color: #0f0f1a;
-      font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 800;
-      cursor: pointer; margin-bottom: 20px; flex-shrink: 0;
-    }
-    .primary-btn:active { opacity: 0.85; }
-
-    /* CAT MANAGEMENT */
-    .cat-mgmt { display: flex; flex-direction: column; gap: 7px; margin-bottom: 20px; }
-    .cat-mgmt-item {
-      display: flex; align-items: center; gap: 8px;
-      padding: 10px 13px; background: var(--surface);
-      border: 1px solid var(--border); border-radius: 12px;
-    }
-    .cat-mgmt-name { flex: 1; font-size: 14px; color: var(--text); }
-    .cat-mgmt-count { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); margin-right: 2px; }
-    .cat-mgmt-inp {
-      flex: 1; padding: 4px 8px; background: var(--bg);
-      border: 1px solid var(--accent); border-radius: 8px;
-      color: var(--text); font-family: 'Syne', sans-serif; font-size: 14px; outline: none;
-      display: none;
-    }
-    .icon-btn {
-      background: none; border: none; cursor: pointer;
-      color: var(--muted); font-size: 15px; padding: 3px 6px;
-      border-radius: 8px; line-height: 1; font-family: 'Syne', sans-serif;
-      transition: all 0.15s;
-    }
-    .icon-btn:hover { background: var(--surface2); color: var(--text); }
-    .icon-btn.ok { color: var(--green); }
-    .icon-btn.ok:hover { background: rgba(74,222,128,0.15); }
-    .icon-btn.del { color: var(--muted); }
-    .icon-btn.del:hover { color: var(--red); background: rgba(248,113,113,0.1); }
-
-    .new-cat-row { display: flex; gap: 8px; margin-bottom: 20px; flex-shrink: 0; }
-    .new-cat-row input {
-      flex: 1; padding: 10px 13px; background: var(--surface);
-      border: 1px solid var(--border); border-radius: 10px;
-      color: var(--text); font-family: 'Syne', sans-serif; font-size: 14px; outline: none;
-    }
-    .new-cat-row input::placeholder { color: var(--muted); }
-    .new-cat-row input:focus { border-color: var(--accent); }
-    .new-cat-row button {
-      padding: 10px 16px; border-radius: 10px;
-      border: 1px solid var(--accent); background: transparent;
-      color: var(--accent); font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
-      cursor: pointer; white-space: nowrap;
-    }
-
-    /* WORD LIST */
-    .cat-check-item { display:flex; align-items:center; gap:8px; padding:7px 10px; background:var(--bg); border:1px solid var(--border); border-radius:10px; cursor:pointer; transition:all 0.15s; }
-    .cat-check-item.selected { border-color:var(--accent); background:rgba(232,197,71,0.08); }
-    .cat-check-item input[type=checkbox] { accent-color:var(--accent); width:16px; height:16px; cursor:pointer; flex-shrink:0; }
-    .cat-check-item span { font-family:'Inter',sans-serif; font-size:14px; color:var(--text); }
-    .wlist { display: flex; flex-direction: column; gap: 7px; }
-    .witem {
-      display: flex; align-items: center;
-      padding: 10px 13px; background: var(--surface);
-      border: 1px solid var(--border); border-radius: 12px; gap: 8px;
-    }
-    .witem-pair { flex: 1; font-size: 14px; color: var(--text); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .witem-cat {
-      font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted);
-      background: var(--surface2); padding: 2px 8px; border-radius: 10px;
-      white-space: nowrap; flex-shrink: 0;
-    }
-    .wdel { background: none; border: none; color: var(--muted); font-size: 18px; cursor: pointer; padding: 0 3px; flex-shrink: 0; }
-    .wdel:active { color: var(--red); }
-    .wedit { background: none; border: none; color: var(--muted); font-size: 15px; cursor: pointer; padding: 0 3px; flex-shrink: 0; }
-    .wedit:active { color: var(--accent); }
-
+    .quiz-q{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px 20px;text-align:center;margin-bottom:14px;flex-shrink:0}
+    .quiz-q-lang{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;color:var(--accent);margin-bottom:10px}
+    .quiz-q-word{font-size:30px;font-weight:700}
+    .opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;flex-shrink:0}
+    .opt{padding:15px 10px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;cursor:pointer;text-align:center;line-height:1.3}
+    .opt:active:not(:disabled){opacity:.8}
+    .opt.correct{background:rgba(74,222,128,.15);border-color:var(--green);color:var(--green)}
+    .opt.wrong{background:rgba(248,113,113,.15);border-color:var(--red);color:var(--red)}
+    .opt:disabled{cursor:default}
+    .quiz-next{width:100%;padding:13px;border-radius:var(--radius);border:1px solid var(--accent);background:transparent;color:var(--accent);font-family:'Inter',sans-serif;font-size:15px;font-weight:700;cursor:pointer;display:none;flex-shrink:0}
+    .quiz-result{display:none;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;gap:10px}
+    .r-score{font-size:60px;font-weight:700;color:var(--accent);line-height:1}
+    .r-label{font-size:14px;color:var(--muted)}
+    .r-replay{margin-top:8px;padding:12px 32px;border-radius:var(--radius);border:1px solid var(--accent);background:transparent;color:var(--accent);font-family:'Inter',sans-serif;font-size:15px;font-weight:700;cursor:pointer}
+    /* PRZEZYJ */
+    .lives-row{display:flex;align-items:center;gap:6px;margin-bottom:14px;flex-shrink:0}
+    .life{font-size:20px;transition:all .2s}
+    .life.lost{opacity:.2;filter:grayscale(1)}
+    .survive-result{display:none;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:12px;text-align:center}
+    .survive-score{font-size:56px;font-weight:700;line-height:1}
+    .survive-score.win{color:var(--green)}.survive-score.lose{color:var(--red)}
+    /* SLOWKA */
+    .submenu{display:flex;gap:6px;margin-bottom:16px;flex-shrink:0}
+    .smtab{flex:1;padding:8px 4px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Inter',sans-serif;font-size:12px;font-weight:500;cursor:pointer}
+    .smtab.active{background:var(--surface2);color:var(--text);border-color:var(--muted);font-weight:600}
+    .subscreen{display:none;flex-direction:column;flex:1;min-height:0}
+    .subscreen.active{display:flex}
+    .wlist{display:flex;flex-direction:column;gap:7px}
+    .witem{display:flex;align-items:center;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:12px;gap:10px;cursor:pointer;transition:background .15s}
+    .witem:active{background:var(--surface2)}
+    .witem-word{flex:1;font-size:15px;font-weight:500;color:var(--text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .witem-pct{font-family:'DM Mono',monospace;font-size:12px;flex-shrink:0}
+    .witem-learned{font-size:14px;flex-shrink:0}
+    .pct-good{color:var(--green)}.pct-mid{color:var(--orange)}.pct-bad{color:var(--red)}.pct-none{color:var(--muted)}
+    .show-learned-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-shrink:0}
+    .toggle-btn{position:relative;width:40px;height:22px;background:var(--border);border-radius:11px;border:none;cursor:pointer;transition:background .2s;flex-shrink:0}
+    .toggle-btn.on{background:var(--accent)}
+    .toggle-btn::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;background:var(--text);border-radius:50%;transition:transform .2s}
+    .toggle-btn.on::after{transform:translateX(18px);background:#0f0f1a}
+    .toggle-lbl{font-size:13px;color:var(--muted)}
+    /* DETAIL */
+    .detail-back{background:none;border:none;color:var(--accent);font-family:'Inter',sans-serif;font-size:14px;cursor:pointer;padding:0 0 14px;display:flex;align-items:center;gap:6px;flex-shrink:0}
+    .detail-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:14px;flex-shrink:0}
+    .detail-pl{font-size:28px;font-weight:700;margin-bottom:4px}
+    .detail-es{font-size:22px;color:var(--accent);margin-bottom:12px}
+    .detail-cats{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+    .detail-cat{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);background:var(--surface2);padding:3px 9px;border-radius:10px}
+    .detail-learned-row{display:flex;align-items:center;gap:10px}
+    .detail-learned-lbl{font-size:14px;color:var(--muted)}
+    .stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px;flex-shrink:0}
+    .stat-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 10px;text-align:center}
+    .stat-val{font-size:24px;font-weight:700;margin-bottom:4px}
+    .stat-lbl{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)}
+    .sr-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px;flex-shrink:0}
+    .sr-title{font-size:13px;font-weight:600;margin-bottom:6px}
+    .sr-next{font-size:13px;color:var(--muted)}
+    .sr-next span{color:var(--accent)}
+    .detail-btns{display:flex;gap:8px;flex-shrink:0}
+    .btn-edit{flex:1;padding:12px;border-radius:var(--radius);border:1px solid var(--border);background:transparent;color:var(--text);font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer}
+    .btn-del{padding:12px 20px;border-radius:var(--radius);border:1px solid rgba(248,113,113,.3);background:transparent;color:var(--red);font-family:'Inter',sans-serif;font-size:14px;cursor:pointer}
+    /* CAT MGMT */
+    .cat-mgmt{display:flex;flex-direction:column;gap:7px;margin-bottom:4px}
+    .cat-mgmt-item{display:flex;align-items:center;gap:8px;padding:10px 13px;background:var(--surface);border:1px solid var(--border);border-radius:12px}
+    .cat-mgmt-name{flex:1;font-size:14px;color:var(--text)}
+    .cat-mgmt-count{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-right:2px}
+    .cat-mgmt-inp{flex:1;padding:4px 8px;background:var(--bg);border:1px solid var(--accent);border-radius:8px;color:var(--text);font-family:'Inter',sans-serif;font-size:14px;outline:none;display:none}
+    .icon-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;padding:3px 6px;border-radius:8px;line-height:1;transition:all .15s}
+    .icon-btn:hover{background:var(--surface2);color:var(--text)}
+    .icon-btn.ok{color:var(--green)}.icon-btn.ok:hover{background:rgba(74,222,128,.15)}
+    .icon-btn.del{color:var(--muted)}.icon-btn.del:hover{color:var(--red);background:rgba(248,113,113,.1)}
+    .new-cat-row{display:flex;gap:8px;margin-bottom:4px;flex-shrink:0}
+    .new-cat-row input{flex:1;padding:10px 13px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Inter',sans-serif;font-size:14px;outline:none}
+    .new-cat-row input::placeholder{color:var(--muted)}
+    .new-cat-row input:focus{border-color:var(--accent)}
+    .new-cat-row button{padding:10px 16px;border-radius:10px;border:1px solid var(--accent);background:transparent;color:var(--accent);font-family:'Inter',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+    /* ADD FORM */
+    .add-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;flex-shrink:0}
+    .field{margin-bottom:12px}.field:last-child{margin-bottom:0}
+    .field label{display:block;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--accent);margin-bottom:5px}
+    .field input{width:100%;padding:11px 13px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Inter',sans-serif;font-size:15px;outline:none}
+    .field input:focus{border-color:var(--accent)}
+    .field input::placeholder{color:var(--muted)}
+    .cats-check-wrap{display:flex;flex-direction:column;gap:6px;margin-top:2px}
+    .cat-check-item{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--bg);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all .15s}
+    .cat-check-item.selected{border-color:var(--accent);background:rgba(232,197,71,.08)}
+    .cat-check-item input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px;cursor:pointer;flex-shrink:0}
+    .cat-check-item span{font-family:'Inter',sans-serif;font-size:14px;color:var(--text)}
+    .primary-btn{width:100%;padding:13px;border-radius:var(--radius);border:none;background:var(--accent);color:#0f0f1a;font-family:'Inter',sans-serif;font-size:15px;font-weight:800;cursor:pointer;margin-bottom:4px;flex-shrink:0}
+    .primary-btn:active{opacity:.85}
     /* MODAL */
-    .modal-overlay {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.7); z-index: 100;
-      align-items: flex-end; justify-content: center;
-    }
-    .modal-overlay.open { display: flex; }
-    .modal {
-      width: 100%; max-width: 480px;
-      background: var(--surface); border-radius: var(--radius) var(--radius) 0 0;
-      padding: 20px 20px 36px; display: flex; flex-direction: column; gap: 14px;
-    }
-    .modal-title { font-size: 16px; font-weight: 700; color: var(--text); }
-    .modal-field { display: flex; flex-direction: column; gap: 5px; }
-    .modal-field label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; color: var(--accent); }
-    .modal-field input {
-      padding: 10px 13px; background: var(--bg);
-      border: 1px solid var(--border); border-radius: 10px;
-      color: var(--text); font-family: 'Inter', sans-serif; font-size: 15px; outline: none;
-    }
-    .modal-field input:focus { border-color: var(--accent); }
-    .modal-cats { display: flex; flex-direction: column; gap: 6px; }
-    .modal-btns { display: flex; gap: 8px; margin-top: 4px; }
-    .modal-save {
-      flex: 1; padding: 12px; border-radius: var(--radius);
-      border: none; background: var(--accent); color: #0f0f1a;
-      font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 800; cursor: pointer;
-    }
-    .modal-cancel {
-      padding: 12px 20px; border-radius: var(--radius);
-      border: 1px solid var(--border); background: transparent;
-      color: var(--muted); font-family: 'Syne', sans-serif; font-size: 15px; cursor: pointer;
-    }
-
-    .empty-st {
-      flex: 1; display: flex; align-items: center; justify-content: center;
-      text-align: center; font-size: 14px; color: var(--muted); padding: 40px 20px;
-    }
-    .divider { height: 1px; background: var(--border); margin: 4px 0 14px; flex-shrink: 0; }
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:flex-end;justify-content:center}
+    .modal-overlay.open{display:flex}
+    .modal{width:100%;max-width:480px;background:var(--surface);border-radius:var(--radius) var(--radius) 0 0;padding:20px 20px 36px;display:flex;flex-direction:column;gap:14px}
+    .modal-title{font-size:16px;font-weight:700;color:var(--text)}
+    .modal-field{display:flex;flex-direction:column;gap:5px}
+    .modal-field label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--accent)}
+    .modal-field input{padding:10px 13px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Inter',sans-serif;font-size:15px;outline:none}
+    .modal-field input:focus{border-color:var(--accent)}
+    .modal-btns{display:flex;gap:8px;margin-top:4px}
+    .modal-save{flex:1;padding:12px;border-radius:var(--radius);border:none;background:var(--accent);color:#0f0f1a;font-family:'Inter',sans-serif;font-size:15px;font-weight:800;cursor:pointer}
+    .modal-cancel{padding:12px 20px;border-radius:var(--radius);border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Inter',sans-serif;font-size:15px;cursor:pointer}
   </style>
 </head>
 <body>
 
 <div class="header">
   <div class="header-title">Fiszki <span>ES</span></div>
-  <div class="header-count" id="hcount">0 słówek</div>
+  <div class="hbadge" id="hcount">0 słówek</div>
 </div>
 
 <div class="tabs">
   <button class="tab active" onclick="switchTab('fiszki')">Fiszki</button>
   <button class="tab" onclick="switchTab('quiz')">Quiz</button>
-  <button class="tab" onclick="switchTab('dodaj')">+ Dodaj</button>
+  <button class="tab" onclick="switchTab('przezyj')">Przeżyj</button>
+  <button class="tab" onclick="switchTab('slowka')">Słówka</button>
 </div>
 
 <!-- FISZKI -->
 <div class="screen active" id="screen-fiszki">
-  <div class="sec-label">KATEGORIA</div>
+  <div class="sec-lbl">KATEGORIA</div>
   <div class="cat-bar" id="f-cats"></div>
   <div class="divider"></div>
   <div class="prog"><div class="prog-fill" id="f-prog"></div></div>
@@ -367,7 +210,7 @@
 
 <!-- QUIZ -->
 <div class="screen" id="screen-quiz">
-  <div class="sec-label">KATEGORIA</div>
+  <div class="sec-lbl">KATEGORIA</div>
   <div class="cat-bar" id="q-cats"></div>
   <div class="divider"></div>
   <div class="prog"><div class="prog-fill" id="q-prog"></div></div>
@@ -387,38 +230,101 @@
   <div class="empty-st" id="q-empty" style="display:none">Potrzebujesz minimum 4 słówek</div>
 </div>
 
-<!-- DODAJ -->
-<div class="screen" id="screen-dodaj">
-  <div class="sec-label">NOWA KATEGORIA</div>
-  <div class="new-cat-row">
-    <input id="inp-cat" placeholder="np. kolory, jedzenie..." />
-    <button onclick="addCat()">Dodaj</button>
+<!-- PRZEZYJ -->
+<div class="screen" id="screen-przezyj">
+  <div class="sec-lbl">KATEGORIA</div>
+  <div class="cat-bar" id="p-cats"></div>
+  <div class="divider"></div>
+  <div class="lives-row" id="p-lives"></div>
+  <div class="prog"><div class="prog-fill" id="p-prog"></div></div>
+  <div id="przezyj-main">
+    <div class="quiz-q">
+      <div class="quiz-q-lang">PRZETŁUMACZ NA ESPAÑOL</div>
+      <div class="quiz-q-word" id="p-word">--</div>
+    </div>
+    <div class="opts" id="p-opts"></div>
+    <button class="quiz-next" id="p-next" onclick="nextP()">Następne &#8594;</button>
+  </div>
+  <div class="survive-result" id="przezyj-result">
+    <div class="survive-score" id="p-score"></div>
+    <div class="r-label" id="p-label"></div>
+    <button class="r-replay" style="margin-top:8px" onclick="startPrzezyj()">Zagraj ponownie</button>
+  </div>
+  <div class="empty-st" id="p-empty" style="display:none">Potrzebujesz minimum 4 słówek</div>
+</div>
+
+<!-- SLOWKA -->
+<div class="screen" id="screen-slowka">
+  <div class="submenu">
+    <button class="smtab active" onclick="switchSub('wszystkie')">Wszystkie</button>
+    <button class="smtab" onclick="switchSub('kategorie')">Kategorie</button>
+    <button class="smtab" onclick="switchSub('dodaj')">+ Dodaj</button>
   </div>
 
-  <div class="sec-label">ZARZĄDZAJ KATEGORIAMI</div>
-  <div class="cat-mgmt" id="cat-mgmt"></div>
-
-  <div class="sec-label">NOWE SŁÓWKO</div>
-  <div class="add-box">
-    <div class="field"><label>POLSKI</label><input id="inp-pl" placeholder="np. czerwony" /></div>
-    <div class="field"><label>ESPAÑOL</label><input id="inp-es" placeholder="np. rojo" /></div>
-    <div class="field"><label>KATEGORIA (max. 2)</label><div id="inp-cats-check" style="display:flex;flex-direction:column;gap:6px;margin-top:2px"></div></div>
+  <div class="subscreen active" id="sub-wszystkie">
+    <div class="show-learned-row">
+      <button class="toggle-btn" id="show-learned-btn" onclick="toggleShowLearned()"></button>
+      <span class="toggle-lbl">Pokaż nauczone</span>
+    </div>
+    <div class="wlist" id="wlist"></div>
+    <div class="empty-st" id="wlist-empty" style="display:none">Brak słówek</div>
   </div>
-  <button class="primary-btn" onclick="addWord()">Dodaj słówko</button>
 
-  <div class="sec-label" id="wlist-label"></div>
-  <div class="wlist" id="wlist"></div>
+  <div class="subscreen" id="sub-detail">
+    <button class="detail-back" onclick="closeDetail()">&#8592; Wszystkie słówka</button>
+    <div class="detail-card">
+      <div class="detail-pl" id="d-pl"></div>
+      <div class="detail-es" id="d-es"></div>
+      <div class="detail-cats" id="d-cats"></div>
+      <div class="detail-learned-row">
+        <span class="detail-learned-lbl">Nauczone</span>
+        <button class="toggle-btn" id="d-learned-btn" onclick="toggleLearned()"></button>
+      </div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-box"><div class="stat-val" id="d-shown">0</div><div class="stat-lbl">POKAZAŃ</div></div>
+      <div class="stat-box"><div class="stat-val" id="d-correct">0</div><div class="stat-lbl">POPRAWNYCH</div></div>
+      <div class="stat-box"><div class="stat-val pct-none" id="d-pct">--</div><div class="stat-lbl">SKUTECZNOŚĆ</div></div>
+    </div>
+    <div class="sr-box">
+      <div class="sr-title">Spaced Repetition</div>
+      <div class="sr-next" id="d-sr-next">Brak danych</div>
+    </div>
+    <div class="detail-btns">
+      <button class="btn-edit" onclick="openEditFromDetail()">Edytuj</button>
+      <button class="btn-del" onclick="deleteFromDetail()">Usuń</button>
+    </div>
+  </div>
+
+  <div class="subscreen" id="sub-kategorie">
+    <div class="sec-lbl">NOWA KATEGORIA</div>
+    <div class="new-cat-row" style="margin-bottom:16px">
+      <input id="inp-cat" placeholder="np. kolory, jedzenie..." />
+      <button onclick="addCat()">Dodaj</button>
+    </div>
+    <div class="sec-lbl">ZARZĄDZAJ</div>
+    <div class="cat-mgmt" id="cat-mgmt"></div>
+  </div>
+
+  <div class="subscreen" id="sub-dodaj">
+    <div class="add-box">
+      <div class="field"><label>POLSKI</label><input id="inp-pl" placeholder="np. czerwony" /></div>
+      <div class="field"><label>ESPAÑOL</label><input id="inp-es" placeholder="np. rojo" /></div>
+      <div class="field"><label>KATEGORIA (max. 2)</label><div class="cats-check-wrap" id="inp-cats-check"></div></div>
+    </div>
+    <button class="primary-btn" onclick="addWord()">Dodaj słówko</button>
+  </div>
 </div>
 
 <!-- EDIT MODAL -->
-<div class="modal-overlay" id="edit-modal" onclick="closeModal(event)">
+<div class="modal-overlay" id="edit-modal" onclick="closeModalOverlay(event)">
   <div class="modal">
     <div class="modal-title">Edytuj słówko</div>
     <div class="modal-field"><label>POLSKI</label><input id="edit-pl" /></div>
     <div class="modal-field"><label>ESPAÑOL</label><input id="edit-es" /></div>
     <div class="modal-field">
       <label>KATEGORIA (max. 2)</label>
-      <div class="modal-cats" id="edit-cats"></div>
+      <div class="cats-check-wrap" id="edit-cats"></div>
     </div>
     <div class="modal-btns">
       <button class="modal-cancel" onclick="closeEditModal()">Anuluj</button>
@@ -428,356 +334,395 @@
 </div>
 
 <script>
-const SK = 'fiszki-v3';
-const OLD_KEYS = ['fiszki-cats-v2', 'fiszki-cats-v1', 'fiszki-v2'];
-let data = { cats: [], words: [] };
-let fIdx = 0, fFlipped = false, fCat = '__all__';
-let qOrder = [], qIdx = 0, qCorrect = 0, qAnswered = false, qCat = '__all__';
+const SK='fiszki-v4';
+const OLD_KEYS=['fiszki-v3','fiszki-cats-v2','fiszki-cats-v1'];
+let data={cats:[],words:[]};
 
-function save() { try { localStorage.setItem(SK, JSON.stringify(data)); } catch(e) {} }
+function save(){try{localStorage.setItem(SK,JSON.stringify(data));}catch(e){}}
+function getCats(w){return Array.isArray(w.cat)?w.cat:[w.cat];}
+function pct(w){if(!w.stats||!w.stats.shown)return null;return Math.round((w.stats.correct/w.stats.shown)*100);}
 
-function load() {
-  try {
-    const d = localStorage.getItem(SK);
-    if (d) { data = JSON.parse(d); }
-    else {
-      // migracja ze starszych kluczy
-      for (const oldKey of OLD_KEYS) {
-        const old = localStorage.getItem(oldKey);
-        if (old) { data = JSON.parse(old); save(); break; }
-      }
-    }
-  } catch(e) {}
-  if (!data.cats.length) {
-    data.cats = ['Podstawowe', 'Kolory', 'Liczby'];
-    data.words = [
-      { pl: 'cześć', es: 'hola', cat: 'Podstawowe' },
-      { pl: 'dziękuję', es: 'gracias', cat: 'Podstawowe' },
-      { pl: 'proszę', es: 'por favor', cat: 'Podstawowe' },
-      { pl: 'tak', es: 'sí', cat: 'Podstawowe' },
-      { pl: 'nie', es: 'no', cat: 'Podstawowe' },
-      { pl: 'czerwony', es: 'rojo', cat: 'Kolory' },
-      { pl: 'niebieski', es: 'azul', cat: 'Kolory' },
-      { pl: 'zielony', es: 'verde', cat: 'Kolory' },
-      { pl: 'żółty', es: 'amarillo', cat: 'Kolory' },
-      { pl: 'jeden', es: 'uno', cat: 'Liczby' },
-      { pl: 'dwa', es: 'dos', cat: 'Liczby' },
-      { pl: 'trzy', es: 'tres', cat: 'Liczby' },
+function ensureStats(w){
+  if(!w.stats)w.stats={shown:0,correct:0,interval:1,easeFactor:2.5,nextReview:0};
+}
+
+function load(){
+  try{
+    const d=localStorage.getItem(SK);
+    if(d){data=JSON.parse(d);}
+    else{for(const k of OLD_KEYS){const old=localStorage.getItem(k);if(old){data=JSON.parse(old);save();break;}}}
+  }catch(e){}
+  if(!data.cats.length){
+    data.cats=['Podstawowe','Kolory','Liczby'];
+    data.words=[
+      {pl:'cześć',es:'hola',cat:'Podstawowe'},{pl:'dziękuję',es:'gracias',cat:'Podstawowe'},
+      {pl:'proszę',es:'por favor',cat:'Podstawowe'},{pl:'tak',es:'sí',cat:'Podstawowe'},
+      {pl:'nie',es:'no',cat:'Podstawowe'},
+      {pl:'czerwony',es:'rojo',cat:'Kolory'},{pl:'niebieski',es:'azul',cat:'Kolory'},
+      {pl:'zielony',es:'verde',cat:'Kolory'},{pl:'żółty',es:'amarillo',cat:'Kolory'},
+      {pl:'jeden',es:'uno',cat:'Liczby'},{pl:'dwa',es:'dos',cat:'Liczby'},
+      {pl:'trzy',es:'tres',cat:'Liczby'},
     ];
   }
+  data.words.forEach(ensureStats);
   renderAll();
 }
 
-function getCats(w) { return Array.isArray(w.cat) ? w.cat : [w.cat]; }
-function fw(cat) { return cat === '__all__' ? data.words : data.words.filter(w => getCats(w).includes(cat)); }
-
-function renderAll() {
-  document.getElementById('hcount').textContent = data.words.length + ' słówek';
-  renderCatBars(); renderFiszki(); renderCatMgmt(); renderWordList(); renderSelect();
+// SPACED REPETITION (SM-2)
+function srUpdate(w,correct){
+  ensureStats(w);
+  const s=w.stats;
+  s.shown++;
+  if(correct){
+    s.correct++;
+    s.easeFactor=Math.max(1.3,s.easeFactor+0.1);
+    s.interval=s.interval<=1?1:Math.round(s.interval*s.easeFactor);
+  }else{
+    s.easeFactor=Math.max(1.3,s.easeFactor-0.2);
+    s.interval=1;
+  }
+  s.nextReview=Date.now()+s.interval*24*60*60*1000;
+  if(s.shown>=5&&pct(w)>=90&&!w.learned)w.learned=true;
+  save();
 }
 
-function renderCatBars() {
-  ['f', 'q'].forEach(p => {
-    const bar = document.getElementById(p + '-cats');
-    const ac = p === 'f' ? fCat : qCat;
-    bar.innerHTML = '';
-    const all = document.createElement('button');
-    all.className = 'cat-pill' + (ac === '__all__' ? ' active' : '');
-    all.textContent = 'Wszystkie';
-    all.onclick = () => { if (p === 'f') { fCat = '__all__'; fIdx = 0; fFlipped = false; } else qCat = '__all__'; renderAll(); if (p === 'q') startQuiz(); };
+function srSort(words){
+  const now=Date.now();
+  const due=words.filter(w=>!w.stats||!w.stats.nextReview||w.stats.nextReview<=now);
+  const notDue=words.filter(w=>!due.includes(w));
+  return[...due.sort(()=>Math.random()-.5),...notDue.sort(()=>Math.random()-.5)];
+}
+
+function fw(cat,inclLearned=false){
+  let ws=cat==='__all__'?data.words:data.words.filter(w=>getCats(w).includes(cat));
+  if(!inclLearned)ws=ws.filter(w=>!w.learned);
+  return ws;
+}
+
+function renderAll(){
+  document.getElementById('hcount').textContent=data.words.length+' słówek';
+  renderCatBars();renderFiszki();renderWordList();renderCatMgmt();renderAddCats('inp-cats-check',[]);
+}
+
+// CAT BARS
+let fCat='__all__',qCat='__all__',pCat='__all__';
+function renderCatBars(){
+  [['f',()=>fCat,v=>{fCat=v;fIdx=0;fFlipped=false;},renderFiszki],
+   ['q',()=>qCat,v=>{qCat=v;},startQuiz],
+   ['p',()=>pCat,v=>{pCat=v;},startPrzezyj]
+  ].forEach(([prefix,getAc,setAc,onSelect])=>{
+    const bar=document.getElementById(prefix+'-cats'),ac=getAc();
+    bar.innerHTML='';
+    const all=document.createElement('button');
+    all.className='cat-pill'+(ac==='__all__'?' active':'');
+    all.textContent='Wszystkie';
+    all.onclick=()=>{setAc('__all__');renderAll();onSelect();};
     bar.appendChild(all);
-    data.cats.forEach(cat => {
-      const btn = document.createElement('button');
-      btn.className = 'cat-pill' + (ac === cat ? ' active' : '');
-      btn.textContent = cat;
-      btn.onclick = () => { if (p === 'f') { fCat = cat; fIdx = 0; fFlipped = false; } else qCat = cat; renderAll(); if (p === 'q') startQuiz(); };
+    data.cats.forEach(cat=>{
+      const btn=document.createElement('button');
+      btn.className='cat-pill'+(ac===cat?' active':'');
+      btn.textContent=cat;
+      btn.onclick=()=>{setAc(cat);renderAll();onSelect();};
       bar.appendChild(btn);
     });
   });
 }
 
-function renderFiszki() {
-  const ws = fw(fCat);
-  const card = document.getElementById('fiszka');
-  const fb = document.getElementById('f-fb');
-  const empty = document.getElementById('f-empty');
-  if (!ws.length) {
-    empty.style.display = 'flex'; card.parentElement.style.display = 'none'; fb.style.display = 'none';
-    document.getElementById('f-ctr').textContent = '0 / 0';
-    document.getElementById('f-prog').style.width = '0%';
-    return;
-  }
-  empty.style.display = 'none'; card.parentElement.style.display = '';
-  if (fIdx >= ws.length) fIdx = 0;
-  const w = ws[fIdx];
-  document.getElementById('f-front').textContent = w.pl;
-  document.getElementById('f-back').textContent = w.es;
-  document.getElementById('f-ctag').textContent = getCats(w).join(', ');
-  document.getElementById('f-ctr').textContent = (fIdx + 1) + ' / ' + ws.length;
-  document.getElementById('f-prog').style.width = (((fIdx + 1) / ws.length) * 100) + '%';
-  if (fFlipped) { card.classList.add('flipped'); fb.style.display = 'flex'; }
-  else { card.classList.remove('flipped'); fb.style.display = 'none'; }
+// FISZKI
+let fIdx=0,fFlipped=false;
+function renderFiszki(){
+  const ws=fw(fCat,true),card=document.getElementById('fiszka'),fb=document.getElementById('f-fb'),empty=document.getElementById('f-empty');
+  if(!ws.length){empty.style.display='flex';card.parentElement.style.display='none';fb.style.display='none';document.getElementById('f-ctr').textContent='0 / 0';document.getElementById('f-prog').style.width='0%';return;}
+  empty.style.display='none';card.parentElement.style.display='';
+  if(fIdx>=ws.length)fIdx=0;
+  const w=ws[fIdx];
+  document.getElementById('f-front').textContent=w.pl;
+  document.getElementById('f-back').textContent=w.es;
+  document.getElementById('f-ctag').textContent=getCats(w).join(', ');
+  document.getElementById('f-ctr').textContent=(fIdx+1)+' / '+ws.length;
+  document.getElementById('f-prog').style.width=(((fIdx+1)/ws.length)*100)+'%';
+  if(fFlipped){card.classList.add('flipped');fb.style.display='flex';}
+  else{card.classList.remove('flipped');fb.style.display='none';}
+}
+function flipCard(){fFlipped=!fFlipped;renderFiszki();}
+function cardFb(){fFlipped=false;nextCard();}
+function nextCard(){fFlipped=false;const ws=fw(fCat,true);fIdx=(fIdx+1)%ws.length;renderFiszki();}
+function prevCard(){fFlipped=false;const ws=fw(fCat,true);fIdx=(fIdx-1+ws.length)%ws.length;renderFiszki();}
+
+// QUIZ
+let qOrder=[],qIdx=0,qCorrect=0,qAnswered=false;
+function startQuiz(){
+  const ws=srSort(fw(qCat));
+  const empty=document.getElementById('q-empty'),main=document.getElementById('quiz-main'),result=document.getElementById('quiz-result');
+  result.style.display='none';main.style.display='';
+  if(ws.length<4){empty.style.display='flex';main.style.display='none';return;}
+  empty.style.display='none';
+  qOrder=ws.map((_,i)=>i);qIdx=0;qCorrect=0;qAnswered=false;
+  renderQ(ws);
+}
+function renderQ(ws){
+  if(!ws)ws=srSort(fw(qCat));
+  if(qIdx>=qOrder.length){showQuizResult(qOrder.length);return;}
+  document.getElementById('q-prog').style.width=((qIdx/qOrder.length)*100)+'%';
+  const w=ws[qOrder[qIdx]];
+  document.getElementById('q-word').textContent=w.pl;
+  const dis=ws.filter((_,i)=>i!==qOrder[qIdx]).sort(()=>Math.random()-.5).slice(0,3);
+  buildOpts(document.getElementById('q-opts'),[...dis,w].sort(()=>Math.random()-.5),w,(correct)=>{
+    srUpdate(w,correct);if(correct)qCorrect++;
+    document.getElementById('q-next').style.display='block';qAnswered=true;
+  });
+  document.getElementById('q-next').style.display='none';qAnswered=false;
+}
+function nextQ(){qIdx++;renderQ();}
+function showQuizResult(total){
+  document.getElementById('q-prog').style.width='100%';
+  document.getElementById('quiz-main').style.display='none';
+  const result=document.getElementById('quiz-result');result.style.display='flex';
+  const p=Math.round((qCorrect/total)*100);
+  document.getElementById('r-score').textContent=qCorrect+'/'+total;
+  document.getElementById('r-label').textContent=p+'% poprawnych — '+(p>=80?'Świetnie!':p>=50?'Nieźle, ćwicz dalej!':'Trzeba pouczyć!');
 }
 
-function flipCard() { fFlipped = !fFlipped; renderFiszki(); }
-function cardFb() { fFlipped = false; nextCard(); }
-function nextCard() { fFlipped = false; const ws = fw(fCat); fIdx = (fIdx + 1) % ws.length; renderFiszki(); }
-function prevCard() { fFlipped = false; const ws = fw(fCat); fIdx = (fIdx - 1 + ws.length) % ws.length; renderFiszki(); }
-
-function startQuiz() {
-  const ws = fw(qCat);
-  const empty = document.getElementById('q-empty');
-  const main = document.getElementById('quiz-main');
-  const result = document.getElementById('quiz-result');
-  result.style.display = 'none'; main.style.display = '';
-  if (ws.length < 4) { empty.style.display = 'flex'; main.style.display = 'none'; return; }
-  empty.style.display = 'none';
-  qOrder = [...Array(ws.length).keys()].sort(() => Math.random() - .5);
-  qIdx = 0; qCorrect = 0; qAnswered = false;
-  renderQ();
-}
-
-function renderQ() {
-  const ws = fw(qCat);
-  if (qIdx >= qOrder.length) { showResult(); return; }
-  document.getElementById('q-prog').style.width = ((qIdx / qOrder.length) * 100) + '%';
-  const w = ws[qOrder[qIdx]];
-  document.getElementById('q-word').textContent = w.pl;
-  const dis = ws.filter((_, i) => i !== qOrder[qIdx]).sort(() => Math.random() - .5).slice(0, 3);
-  const opts = [...dis, w].sort(() => Math.random() - .5);
-  const grid = document.getElementById('q-opts');
-  grid.innerHTML = '';
-  opts.forEach(o => {
-    const b = document.createElement('button');
-    b.className = 'opt'; b.textContent = o.es;
-    b.onclick = () => checkAns(b, o.es, w.es);
+function buildOpts(grid,opts,correct,onAnswer){
+  grid.innerHTML='';
+  opts.forEach(o=>{
+    const b=document.createElement('button');b.className='opt';b.textContent=o.es;
+    b.onclick=()=>{
+      if(b.disabled)return;
+      grid.querySelectorAll('.opt').forEach(x=>{x.disabled=true;if(x.textContent===correct.es)x.classList.add('correct');});
+      const ok=o.es===correct.es;if(!ok)b.classList.add('wrong');
+      onAnswer(ok);
+    };
     grid.appendChild(b);
   });
-  document.getElementById('q-next').style.display = 'none';
-  qAnswered = false;
 }
 
-function checkAns(btn, chosen, correct) {
-  if (qAnswered) return; qAnswered = true;
-  document.querySelectorAll('.opt').forEach(b => { b.disabled = true; if (b.textContent === correct) b.classList.add('correct'); });
-  if (chosen === correct) { qCorrect++; btn.classList.add('correct'); } else btn.classList.add('wrong');
-  document.getElementById('q-next').style.display = 'block';
+// PRZEZYJ
+let pOrder=[],pIdx=0,pLives=3,pScore=0,pAnswered=false;
+function startPrzezyj(){
+  const ws=srSort(fw(pCat));
+  const empty=document.getElementById('p-empty'),main=document.getElementById('przezyj-main'),result=document.getElementById('przezyj-result');
+  result.style.display='none';main.style.display='';
+  if(ws.length<4){empty.style.display='flex';main.style.display='none';return;}
+  empty.style.display='none';
+  pOrder=ws.map((_,i)=>i);pIdx=0;pLives=3;pScore=0;pAnswered=false;
+  renderLives();renderP(ws);
 }
-
-function nextQ() { qIdx++; renderQ(); }
-
-function showResult() {
-  document.getElementById('q-prog').style.width = '100%';
-  document.getElementById('quiz-main').style.display = 'none';
-  const result = document.getElementById('quiz-result');
-  result.style.display = 'flex';
-  const pct = Math.round((qCorrect / qOrder.length) * 100);
-  document.getElementById('r-score').textContent = qCorrect + '/' + qOrder.length;
-  document.getElementById('r-label').textContent = pct + '% poprawnych — ' + (pct >= 80 ? 'Świetnie!' : pct >= 50 ? 'Nieźle, ćwicz dalej!' : 'Trzeba pouczyć!');
+function renderLives(){
+  const row=document.getElementById('p-lives');row.innerHTML='';
+  for(let i=0;i<3;i++){const s=document.createElement('span');s.className='life'+(i>=pLives?' lost':'');s.textContent='❤️';row.appendChild(s);}
 }
-
-function renderCatMgmt() {
-  const mgmt = document.getElementById('cat-mgmt');
-  mgmt.innerHTML = '';
-  if (!data.cats.length) {
-    mgmt.innerHTML = '<div style="font-size:13px;color:var(--muted);padding:6px 0">Brak kategorii</div>';
-    return;
-  }
-  data.cats.forEach((cat, i) => {
-    const count = data.words.filter(w => getCats(w).includes(cat)).length;
-    const el = document.createElement('div');
-    el.className = 'cat-mgmt-item';
-    el.id = 'cmi-' + i;
-    el.innerHTML = `
-      <span class="cat-mgmt-name" id="cmn-${i}">${cat}</span>
-      <input class="cat-mgmt-inp" id="cmi-inp-${i}" value="${cat}" />
-      <span class="cat-mgmt-count">${count}</span>
-      <button class="icon-btn" id="cmi-edit-${i}" onclick="startEditCat(${i})" title="Zmień nazwę">✏</button>
-      <button class="icon-btn ok" id="cmi-ok-${i}" onclick="saveEditCat(${i})" title="Zapisz" style="display:none">✓</button>
-      <button class="icon-btn del" onclick="deleteCat(${i})" title="Usuń">✕</button>
-    `;
-    mgmt.appendChild(el);
-    document.getElementById('cmi-inp-' + i).addEventListener('keydown', e => {
-      if (e.key === 'Enter') saveEditCat(i);
-      if (e.key === 'Escape') cancelEditCat(i, cat);
-    });
+function renderP(ws){
+  if(!ws)ws=srSort(fw(pCat));
+  if(pIdx>=pOrder.length){endPrzezyj(true,pScore);return;}
+  document.getElementById('p-prog').style.width=((pIdx/pOrder.length)*100)+'%';
+  const w=ws[pOrder[pIdx]];
+  document.getElementById('p-word').textContent=w.pl;
+  const dis=ws.filter((_,i)=>i!==pOrder[pIdx]).sort(()=>Math.random()-.5).slice(0,3);
+  buildOpts(document.getElementById('p-opts'),[...dis,w].sort(()=>Math.random()-.5),w,(correct)=>{
+    srUpdate(w,correct);
+    if(correct){pScore++;}
+    else{pLives--;renderLives();if(pLives<=0){setTimeout(()=>endPrzezyj(false,pScore),900);return;}}
+    document.getElementById('p-next').style.display='block';pAnswered=true;
   });
+  document.getElementById('p-next').style.display='none';pAnswered=false;
+}
+function nextP(){pIdx++;renderP();}
+function endPrzezyj(won,score){
+  document.getElementById('przezyj-main').style.display='none';
+  const result=document.getElementById('przezyj-result');result.style.display='flex';
+  const el=document.getElementById('p-score');
+  el.textContent=won?score+'✓':score+'✗';
+  el.className='survive-score '+(won?'win':'lose');
+  document.getElementById('p-label').textContent=won?'Przeżyłeś! Wszystkie '+score+' słówek!':'Koniec gry! '+score+' słówek bez błędu.';
 }
 
-function startEditCat(i) {
-  document.getElementById('cmn-' + i).style.display = 'none';
-  document.getElementById('cmi-inp-' + i).style.display = 'block';
-  document.getElementById('cmi-edit-' + i).style.display = 'none';
-  document.getElementById('cmi-ok-' + i).style.display = '';
-  document.getElementById('cmi-inp-' + i).focus();
-  document.getElementById('cmi-inp-' + i).select();
-}
-
-function cancelEditCat(i, orig) {
-  document.getElementById('cmn-' + i).style.display = '';
-  document.getElementById('cmi-inp-' + i).style.display = 'none';
-  document.getElementById('cmi-edit-' + i).style.display = '';
-  document.getElementById('cmi-ok-' + i).style.display = 'none';
-  document.getElementById('cmi-inp-' + i).value = orig;
-}
-
-function saveEditCat(i) {
-  const newName = document.getElementById('cmi-inp-' + i).value.trim();
-  const oldName = data.cats[i];
-  if (!newName || newName === oldName) { cancelEditCat(i, oldName); return; }
-  if (data.cats.includes(newName)) { alert('Kategoria o tej nazwie już istnieje.'); return; }
-  data.words.forEach(w => { const cats = getCats(w); const idx = cats.indexOf(oldName); if (idx !== -1) { cats[idx] = newName; w.cat = cats.length === 1 ? cats[0] : cats; } });
-  if (fCat === oldName) fCat = newName;
-  if (qCat === oldName) qCat = newName;
-  data.cats[i] = newName;
-  save(); renderAll();
-}
-
-function deleteCat(i) {
-  const cat = data.cats[i];
-  const count = data.words.filter(w => getCats(w).includes(cat)).length;
-  const msg = count > 0
-    ? `Usunąć kategorię "${cat}"?\nZawiera ${count} słówek - zostaną usunięte lub stracą tę kategorię.`
-    : `Usunąć kategorię "${cat}"?`;
-  if (!confirm(msg)) return;
-  data.words = data.words.filter(w => {
-    const cats = getCats(w).filter(c => c !== cat);
-    if (!cats.length) return false;
-    w.cat = cats.length === 1 ? cats[0] : cats;
-    return true;
+// SLOWKA TAB
+let showLearned=false,detailIdx=-1;
+function switchSub(name){
+  const tabs=document.querySelectorAll('.smtab');
+  ['wszystkie','kategorie','dodaj'].forEach((n,i)=>{if(tabs[i])tabs[i].classList.toggle('active',n===name);});
+  ['wszystkie','detail','kategorie','dodaj'].forEach(n=>{
+    const s=document.getElementById('sub-'+n);if(s)s.classList.toggle('active',n===name);
   });
-  data.cats.splice(i, 1);
-  if (fCat === cat) { fCat = '__all__'; fIdx = 0; fFlipped = false; }
-  if (qCat === cat) qCat = '__all__';
-  save(); renderAll();
+  if(name==='wszystkie')renderWordList();
+  if(name==='kategorie')renderCatMgmt();
+  if(name==='dodaj')renderAddCats('inp-cats-check',[]);
 }
-
-function addCat() {
-  const v = document.getElementById('inp-cat').value.trim();
-  if (!v || data.cats.includes(v)) return;
-  data.cats.push(v); save();
-  document.getElementById('inp-cat').value = '';
-  renderAll();
+function toggleShowLearned(){
+  showLearned=!showLearned;
+  document.getElementById('show-learned-btn').classList.toggle('on',showLearned);
+  renderWordList();
 }
-
-let editIdx = -1;
-
-function openEditModal(i) {
-  editIdx = i;
-  const w = data.words[i];
-  const cats = getCats(w);
-  document.getElementById('edit-pl').value = w.pl;
-  document.getElementById('edit-es').value = w.es;
-  const box = document.getElementById('edit-cats');
-  box.innerHTML = '';
-  data.cats.forEach(c => {
-    const item = document.createElement('label');
-    const isChecked = cats.includes(c);
-    item.className = 'cat-check-item' + (isChecked ? ' selected' : '');
-    item.innerHTML = `<input type="checkbox" value="${c}" ${isChecked ? 'checked' : ''} /><span>${c}</span>`;
-    const cb = item.querySelector('input');
-    cb.addEventListener('change', () => {
-      const allChecked = [...document.querySelectorAll('#edit-cats input:checked')];
-      if (allChecked.length > 2) { cb.checked = false; return; }
-      item.classList.toggle('selected', cb.checked);
-    });
-    box.appendChild(item);
-  });
-  document.getElementById('edit-modal').classList.add('open');
-}
-
-function closeEditModal() {
-  document.getElementById('edit-modal').classList.remove('open');
-  editIdx = -1;
-}
-
-function closeModal(e) {
-  if (e.target === document.getElementById('edit-modal')) closeEditModal();
-}
-
-function saveEdit() {
-  if (editIdx === -1) return;
-  const pl = document.getElementById('edit-pl').value.trim();
-  const es = document.getElementById('edit-es').value.trim();
-  const checked = [...document.querySelectorAll('#edit-cats input:checked')].map(cb => cb.value);
-  if (!pl || !es || !checked.length) { if (!checked.length) alert('Wybierz co najmniej jedną kategorię.'); return; }
-  data.words[editIdx] = { pl, es, cat: checked.length === 1 ? checked[0] : checked };
-  save(); renderAll(); closeEditModal();
-}
-
-function addWord() {
-  const pl = document.getElementById('inp-pl').value.trim();
-  const es = document.getElementById('inp-es').value.trim();
-  const checked = [...document.querySelectorAll('#inp-cats-check input:checked')].map(cb => cb.value);
-  if (!pl || !es || !checked.length) { if (!checked.length) alert('Wybierz co najmniej jedną kategorię.'); return; }
-  const cat = checked.length === 1 ? checked[0] : checked;
-  data.words.push({ pl, es, cat }); save();
-  document.getElementById('inp-pl').value = '';
-  document.getElementById('inp-es').value = '';
-  document.querySelectorAll('#inp-cats-check input').forEach(cb => cb.checked = false);
-  document.querySelectorAll('#inp-cats-check .cat-check-item').forEach(el => el.classList.remove('selected'));
-  renderAll();
-  document.getElementById('inp-pl').focus();
-}
-
-function deleteWord(i) {
-  data.words.splice(i, 1);
-  const ws = fw(fCat);
-  if (fIdx >= ws.length) fIdx = Math.max(0, ws.length - 1);
-  save(); renderAll();
-}
-
-function renderSelect() {
-  const box = document.getElementById('inp-cats-check');
-  const checked = [...document.querySelectorAll('#inp-cats-check input:checked')].map(cb => cb.value);
-  box.innerHTML = '';
-  data.cats.forEach(c => {
-    const item = document.createElement('label');
-    item.className = 'cat-check-item' + (checked.includes(c) ? ' selected' : '');
-    item.innerHTML = `<input type="checkbox" value="${c}" ${checked.includes(c) ? 'checked' : ''} /><span>${c}</span>`;
-    const cb = item.querySelector('input');
-    cb.addEventListener('change', () => {
-      const allChecked = [...document.querySelectorAll('#inp-cats-check input:checked')];
-      if (allChecked.length > 2) { cb.checked = false; return; }
-      item.classList.toggle('selected', cb.checked);
-    });
-    box.appendChild(item);
-  });
-}
-
-function renderWordList() {
-  const lbl = document.getElementById('wlist-label');
-  const list = document.getElementById('wlist');
-  lbl.textContent = data.words.length ? 'WSZYSTKIE SŁÓWKA (' + data.words.length + ')' : '';
-  list.innerHTML = '';
-  data.words.forEach((w, i) => {
-    const cats = getCats(w);
-    const catPills = cats.map(c => '<span class="witem-cat">' + c + '</span>').join('');
-    const el = document.createElement('div');
-    el.className = 'witem';
-    el.innerHTML = '<span class="witem-pair">' + w.pl + ' → ' + w.es + '</span>' + catPills + '<button class="wedit" onclick="openEditModal(' + i + ')">✏</button><button class="wdel" onclick="deleteWord(' + i + ')">×</button>';
+function renderWordList(){
+  const list=document.getElementById('wlist'),empty=document.getElementById('wlist-empty');
+  list.innerHTML='';
+  const ws=showLearned?data.words:data.words.filter(w=>!w.learned);
+  if(!ws.length){empty.style.display='flex';return;}
+  empty.style.display='none';
+  ws.forEach(w=>{
+    const realIdx=data.words.indexOf(w);
+    const p=pct(w);
+    let pctClass='pct-none',pctTxt='--';
+    if(p!==null){pctTxt=p+'%';pctClass=p>=80?'pct-good':p>=50?'pct-mid':'pct-bad';}
+    const el=document.createElement('div');el.className='witem';
+    el.innerHTML=`<span class="witem-word">${w.es}</span><span class="witem-pct ${pctClass}">${pctTxt}</span>${w.learned?'<span class="witem-learned" title="Nauczone">✓</span>':''}`;
+    el.onclick=()=>openDetail(realIdx);
     list.appendChild(el);
   });
 }
-
-function switchTab(name) {
-  ['fiszki', 'quiz', 'dodaj'].forEach((n, i) => {
-    document.querySelectorAll('.tab')[i].classList.toggle('active', n === name);
-    document.getElementById('screen-' + n).classList.toggle('active', n === name);
-  });
-  if (name === 'quiz') startQuiz();
-  if (name === 'fiszki') renderFiszki();
+function openDetail(idx){
+  detailIdx=idx;
+  const w=data.words[idx];ensureStats(w);
+  document.getElementById('d-pl').textContent=w.pl;
+  document.getElementById('d-es').textContent=w.es;
+  document.getElementById('d-cats').innerHTML=getCats(w).map(c=>`<span class="detail-cat">${c}</span>`).join('');
+  const p=pct(w);
+  document.getElementById('d-shown').textContent=w.stats.shown;
+  document.getElementById('d-correct').textContent=w.stats.correct;
+  const pEl=document.getElementById('d-pct');
+  pEl.textContent=p!==null?p+'%':'--';
+  pEl.className='stat-val '+(p===null?'pct-none':p>=80?'pct-good':p>=50?'pct-mid':'pct-bad');
+  const nr=w.stats.nextReview,srEl=document.getElementById('d-sr-next');
+  if(!nr){srEl.innerHTML='Jeszcze nie ćwiczone w quizie';}
+  else{
+    const diff=nr-Date.now(),days=Math.ceil(diff/(1000*60*60*24));
+    srEl.innerHTML=diff<=0?'Gotowe do powtórki!':`Następna powtórka za <span>${days} ${days===1?'dzień':'dni'}</span>`;
+  }
+  document.getElementById('d-learned-btn').classList.toggle('on',!!w.learned);
+  document.querySelectorAll('.smtab').forEach(t=>t.style.display='none');
+  document.querySelectorAll('.subscreen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('sub-detail').classList.add('active');
+}
+function closeDetail(){
+  detailIdx=-1;
+  document.querySelectorAll('.smtab').forEach(t=>t.style.display='');
+  switchSub('wszystkie');
+}
+function toggleLearned(){
+  if(detailIdx===-1)return;
+  const w=data.words[detailIdx];w.learned=!w.learned;
+  document.getElementById('d-learned-btn').classList.toggle('on',w.learned);
+  save();
 }
 
-document.getElementById('inp-pl').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('inp-es').focus(); });
-document.getElementById('inp-es').addEventListener('keydown', e => { if (e.key === 'Enter') addWord(); });
-document.getElementById('inp-cat').addEventListener('keydown', e => { if (e.key === 'Enter') addCat(); });
+// KATEGORIE
+function renderCatMgmt(){
+  const mgmt=document.getElementById('cat-mgmt');mgmt.innerHTML='';
+  if(!data.cats.length){mgmt.innerHTML='<div style="font-size:13px;color:var(--muted)">Brak kategorii</div>';return;}
+  data.cats.forEach((cat,i)=>{
+    const count=data.words.filter(w=>getCats(w).includes(cat)).length;
+    const el=document.createElement('div');el.className='cat-mgmt-item';
+    el.innerHTML=`<span class="cat-mgmt-name" id="cmn-${i}">${cat}</span><input class="cat-mgmt-inp" id="cmi-inp-${i}" value="${cat}" /><span class="cat-mgmt-count">${count}</span><button class="icon-btn" id="cmi-edit-${i}" onclick="startEditCat(${i})">✏</button><button class="icon-btn ok" id="cmi-ok-${i}" onclick="saveEditCat(${i})" style="display:none">✓</button><button class="icon-btn del" onclick="deleteCat(${i})">✕</button>`;
+    mgmt.appendChild(el);
+    document.getElementById('cmi-inp-'+i).addEventListener('keydown',e=>{if(e.key==='Enter')saveEditCat(i);if(e.key==='Escape')cancelEditCat(i,cat);});
+  });
+}
+function startEditCat(i){document.getElementById('cmn-'+i).style.display='none';document.getElementById('cmi-inp-'+i).style.display='block';document.getElementById('cmi-edit-'+i).style.display='none';document.getElementById('cmi-ok-'+i).style.display='';document.getElementById('cmi-inp-'+i).focus();document.getElementById('cmi-inp-'+i).select();}
+function cancelEditCat(i,orig){document.getElementById('cmn-'+i).style.display='';document.getElementById('cmi-inp-'+i).style.display='none';document.getElementById('cmi-edit-'+i).style.display='';document.getElementById('cmi-ok-'+i).style.display='none';document.getElementById('cmi-inp-'+i).value=orig;}
+function saveEditCat(i){
+  const newName=document.getElementById('cmi-inp-'+i).value.trim(),oldName=data.cats[i];
+  if(!newName||newName===oldName){cancelEditCat(i,oldName);return;}
+  if(data.cats.includes(newName)){alert('Kategoria o tej nazwie już istnieje.');return;}
+  data.words.forEach(w=>{const cats=getCats(w);const idx=cats.indexOf(oldName);if(idx!==-1){cats[idx]=newName;w.cat=cats.length===1?cats[0]:cats;}});
+  if(fCat===oldName)fCat=newName;if(qCat===oldName)qCat=newName;if(pCat===oldName)pCat=newName;
+  data.cats[i]=newName;save();renderAll();
+}
+function deleteCat(i){
+  const cat=data.cats[i];
+  const count=data.words.filter(w=>getCats(w).includes(cat)).length;
+  const msg=count>0?`Usunąć "${cat}"?\n${count} słówek straci tę kategorię (te z tylko tą kategorią zostaną usunięte).`:`Usunąć "${cat}"?`;
+  if(!confirm(msg))return;
+  data.words=data.words.filter(w=>{const cats=getCats(w).filter(c=>c!==cat);if(!cats.length)return false;w.cat=cats.length===1?cats[0]:cats;return true;});
+  data.cats.splice(i,1);
+  if(fCat===cat){fCat='__all__';fIdx=0;fFlipped=false;}
+  if(qCat===cat)qCat='__all__';if(pCat===cat)pCat='__all__';
+  save();renderAll();
+}
+function addCat(){
+  const v=document.getElementById('inp-cat').value.trim();
+  if(!v||data.cats.includes(v))return;
+  data.cats.push(v);save();document.getElementById('inp-cat').value='';renderAll();
+}
+
+// DODAJ
+function renderAddCats(containerId,selectedCats){
+  const box=document.getElementById(containerId);if(!box)return;
+  box.innerHTML='';
+  data.cats.forEach(c=>{
+    const item=document.createElement('label');
+    const isChecked=selectedCats.includes(c);
+    item.className='cat-check-item'+(isChecked?' selected':'');
+    item.innerHTML=`<input type="checkbox" value="${c}" ${isChecked?'checked':''} /><span>${c}</span>`;
+    const cb=item.querySelector('input');
+    cb.addEventListener('change',()=>{
+      const all=[...box.querySelectorAll('input:checked')];
+      if(all.length>2){cb.checked=false;return;}
+      item.classList.toggle('selected',cb.checked);
+    });
+    box.appendChild(item);
+  });
+}
+function addWord(){
+  const pl=document.getElementById('inp-pl').value.trim();
+  const es=document.getElementById('inp-es').value.trim();
+  const checked=[...document.querySelectorAll('#inp-cats-check input:checked')].map(cb=>cb.value);
+  if(!pl||!es||!checked.length){if(!checked.length)alert('Wybierz co najmniej jedną kategorię.');return;}
+  const w={pl,es,cat:checked.length===1?checked[0]:checked};
+  ensureStats(w);data.words.push(w);save();
+  document.getElementById('inp-pl').value='';document.getElementById('inp-es').value='';
+  renderAddCats('inp-cats-check',[]);renderAll();
+  document.getElementById('inp-pl').focus();
+}
+
+// EDYCJA
+let editIdx=-1;
+function openEditFromDetail(){if(detailIdx!==-1)openEditModal(detailIdx);}
+function openEditModal(i){
+  editIdx=i;const w=data.words[i];
+  document.getElementById('edit-pl').value=w.pl;
+  document.getElementById('edit-es').value=w.es;
+  renderAddCats('edit-cats',getCats(w));
+  document.getElementById('edit-modal').classList.add('open');
+}
+function closeEditModal(){document.getElementById('edit-modal').classList.remove('open');editIdx=-1;}
+function closeModalOverlay(e){if(e.target===document.getElementById('edit-modal'))closeEditModal();}
+function saveEdit(){
+  if(editIdx===-1)return;
+  const pl=document.getElementById('edit-pl').value.trim();
+  const es=document.getElementById('edit-es').value.trim();
+  const checked=[...document.querySelectorAll('#edit-cats input:checked')].map(cb=>cb.value);
+  if(!pl||!es||!checked.length){if(!checked.length)alert('Wybierz co najmniej jedną kategorię.');return;}
+  const w=data.words[editIdx];w.pl=pl;w.es=es;w.cat=checked.length===1?checked[0]:checked;
+  save();renderAll();
+  if(detailIdx===editIdx)openDetail(editIdx);
+  closeEditModal();
+}
+function deleteFromDetail(){
+  if(detailIdx===-1)return;
+  const w=data.words[detailIdx];
+  if(!confirm(`Usunąć "${w.pl} → ${w.es}"?`))return;
+  data.words.splice(detailIdx,1);save();renderAll();closeDetail();
+}
+
+// TAB SWITCH
+function switchTab(name){
+  ['fiszki','quiz','przezyj','slowka'].forEach((n,i)=>{
+    document.querySelectorAll('.tab')[i].classList.toggle('active',n===name);
+    document.getElementById('screen-'+n).classList.toggle('active',n===name);
+  });
+  if(name==='quiz')startQuiz();
+  if(name==='przezyj')startPrzezyj();
+  if(name==='fiszki')renderFiszki();
+  if(name==='slowka'){switchSub('wszystkie');}
+}
+
+document.getElementById('inp-pl').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('inp-es').focus();});
+document.getElementById('inp-es').addEventListener('keydown',e=>{if(e.key==='Enter')addWord();});
+document.getElementById('inp-cat').addEventListener('keydown',e=>{if(e.key==='Enter')addCat();});
 
 load();
-
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
-}
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
 </script>
 </body>
 </html>
