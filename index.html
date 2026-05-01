@@ -424,6 +424,16 @@
     <div class="cat-mgmt" id="cat-mgmt"></div>
   </div>
 
+  <div class="subscreen" id="sub-cat-detail">
+    <button class="detail-back" onclick="closeCatDetail()">&#8592; Kategorie</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-shrink:0">
+      <div style="font-size:18px;font-weight:700" id="cat-detail-title"></div>
+      <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)" id="cat-detail-count"></div>
+    </div>
+    <div class="wlist" id="cat-detail-list"></div>
+    <div class="empty-st" id="cat-detail-empty" style="display:none">Brak słówek w tej kategorii</div>
+  </div>
+
   <div class="subscreen" id="sub-dodaj">
     <div class="add-box">
       <div class="field"><label>POLSKI</label><input id="inp-pl" placeholder="np. czerwony" /></div>
@@ -892,9 +902,15 @@ function openDetail(idx){
   document.getElementById('sub-detail').classList.add('active');
 }
 function closeDetail(){
+  const fromCat = window._detailFromCat || null;
+  window._detailFromCat = null;
   detailIdx=-1;
-  document.getElementById('screen-slowka').querySelectorAll('.smtab').forEach(t=>t.style.display='');
-  switchSub('wszystkie');
+  if(fromCat){
+    openCatDetail(fromCat);
+  } else {
+    document.getElementById('screen-slowka').querySelectorAll('.smtab').forEach(t=>t.style.display='');
+    switchSub('wszystkie');
+  }
 }
 function toggleLearned(){
   if(detailIdx===-1)return;
@@ -1042,10 +1058,58 @@ function renderCatMgmt(){
   data.cats.forEach((cat,i)=>{
     const count=data.words.filter(w=>getCats(w).includes(cat)).length;
     const el=document.createElement('div');el.className='cat-mgmt-item';
-    el.innerHTML=`<span class="cat-mgmt-name" id="cmn-${i}">${cat}</span><input class="cat-mgmt-inp" id="cmi-inp-${i}" value="${cat}" /><span class="cat-mgmt-count">${count}</span><button class="icon-btn" id="cmi-edit-${i}" onclick="startEditCat(${i})">✏</button><button class="icon-btn ok" id="cmi-ok-${i}" onclick="saveEditCat(${i})" style="display:none">✓</button><button class="icon-btn del" onclick="deleteCat(${i})">✕</button>`;
+    el.style.cursor='pointer';
+    el.innerHTML=`<span class="cat-mgmt-name" id="cmn-${i}">${cat}</span><input class="cat-mgmt-inp" id="cmi-inp-${i}" value="${cat}" /><span class="cat-mgmt-count">${count}</span><button class="icon-btn" id="cmi-edit-${i}" onclick="event.stopPropagation();startEditCat(${i})">✏</button><button class="icon-btn ok" id="cmi-ok-${i}" onclick="event.stopPropagation();saveEditCat(${i})" style="display:none">✓</button><button class="icon-btn del" onclick="event.stopPropagation();deleteCat(${i})">✕</button>`;
+    el.onclick=()=>openCatDetail(cat);
     mgmt.appendChild(el);
     document.getElementById('cmi-inp-'+i).addEventListener('keydown',e=>{if(e.key==='Enter')saveEditCat(i);if(e.key==='Escape')cancelEditCat(i,cat);});
   });
+}
+
+function openCatDetail(cat){
+  document.getElementById('cat-detail-title').textContent=cat;
+  const ws=data.words.filter(w=>getCats(w).includes(cat));
+  document.getElementById('cat-detail-count').textContent=ws.length+' słówek';
+  const list=document.getElementById('cat-detail-list');
+  const empty=document.getElementById('cat-detail-empty');
+  list.innerHTML='';
+  if(!ws.length){empty.style.display='flex';list.style.display='none';}
+  else{
+    empty.style.display='none';list.style.display='';
+    ws.forEach(w=>{
+      const realIdx=data.words.indexOf(w);
+      const p=pct(w);
+      let pctClass='pct-none',pctTxt='--';
+      if(p!==null){pctTxt=p+'%';pctClass=p>=80?'pct-good':p>=50?'pct-mid':'pct-bad';}
+      const el=document.createElement('div');el.className='witem';
+      el.innerHTML=`<span class="witem-word">${w.es}</span><span class="witem-pct ${pctClass}">${pctTxt}</span>${w.learned?'<span class="witem-learned">✓</span>':''}`;
+      el.onclick=()=>openDetailFromCat(realIdx,cat);
+      list.appendChild(el);
+    });
+  }
+  // schowaj smtaby, pokaż sub-cat-detail
+  const slowka=document.getElementById('screen-slowka');
+  slowka.querySelectorAll('.smtab').forEach(t=>t.style.display='none');
+  document.querySelectorAll('.subscreen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('sub-cat-detail').classList.add('active');
+}
+
+function openDetailFromCat(idx, fromCat){
+  // zapamiętaj skąd przyszliśmy żeby wrócić
+  window._detailFromCat = fromCat;
+  openDetail(idx);
+  // nadpisz przycisk "wstecz" w detail żeby wracał do kategorii
+  const backBtn=document.querySelector('#sub-detail .detail-back');
+  if(backBtn){
+    backBtn.textContent='← '+fromCat;
+    backBtn.onclick=()=>{ window._detailFromCat=null; openCatDetail(fromCat); };
+  }
+}
+
+function closeCatDetail(){
+  const slowka=document.getElementById('screen-slowka');
+  slowka.querySelectorAll('.smtab').forEach(t=>t.style.display='');
+  switchSub('kategorie');
 }
 function startEditCat(i){document.getElementById('cmn-'+i).style.display='none';document.getElementById('cmi-inp-'+i).style.display='block';document.getElementById('cmi-edit-'+i).style.display='none';document.getElementById('cmi-ok-'+i).style.display='';document.getElementById('cmi-inp-'+i).focus();document.getElementById('cmi-inp-'+i).select();}
 function cancelEditCat(i,orig){document.getElementById('cmn-'+i).style.display='';document.getElementById('cmi-inp-'+i).style.display='none';document.getElementById('cmi-edit-'+i).style.display='';document.getElementById('cmi-ok-'+i).style.display='none';document.getElementById('cmi-inp-'+i).value=orig;}
