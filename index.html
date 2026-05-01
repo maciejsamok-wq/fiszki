@@ -119,6 +119,23 @@
     .detail-btns{display:flex;gap:8px;flex-shrink:0}
     .btn-edit{flex:1;padding:12px;border-radius:var(--radius);border:1px solid var(--border);background:transparent;color:var(--text);font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer}
     .btn-del{padding:12px 20px;border-radius:var(--radius);border:1px solid rgba(248,113,113,.3);background:transparent;color:var(--red);font-family:'Inter',sans-serif;font-size:14px;cursor:pointer}
+    /* KONIUGACJA */
+    .conj-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px;flex-shrink:0}
+    .conj-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+    .conj-title{font-size:13px;font-weight:600}
+    .conj-fetch-btn{padding:6px 14px;border-radius:8px;border:1px solid var(--accent);background:transparent;color:var(--accent);font-family:'Inter',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+    .conj-fetch-btn:disabled{opacity:.5;cursor:default}
+    .conj-status{font-size:12px;color:var(--muted);margin-bottom:10px}
+    .conj-status.err{color:var(--red)}
+    .conj-status.ok{color:var(--green)}
+    .conj-tenses{display:flex;flex-direction:column;gap:10px}
+    .conj-tense-block{background:var(--surface2);border-radius:10px;padding:10px 12px}
+    .conj-tense-name{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;color:var(--accent);margin-bottom:8px}
+    .conj-forms{display:grid;grid-template-columns:1fr 1fr;gap:4px 10px}
+    .conj-form{display:flex;align-items:baseline;gap:5px}
+    .conj-person{font-size:11px;color:var(--muted);flex-shrink:0;min-width:52px}
+    .conj-verb{font-size:14px;font-weight:500;color:var(--text)}
+    .conj-delete-btn{margin-top:10px;width:100%;padding:7px;border-radius:8px;border:1px solid rgba(248,113,113,.3);background:transparent;color:var(--red);font-family:'Inter',sans-serif;font-size:12px;cursor:pointer}
     /* CAT MGMT */
     .cat-mgmt{display:flex;flex-direction:column;gap:7px;margin-bottom:4px}
     .cat-mgmt-item{display:flex;align-items:center;gap:8px;padding:10px 13px;background:var(--surface);border:1px solid var(--border);border-radius:12px}
@@ -381,6 +398,15 @@
     <div class="sr-box">
       <div class="sr-title">Spaced Repetition</div>
       <div class="sr-next" id="d-sr-next">Brak danych</div>
+    </div>
+    <div class="conj-box">
+      <div class="conj-header">
+        <div class="conj-title">Odmiana czasownika</div>
+        <button class="conj-fetch-btn" id="conj-fetch-btn" onclick="fetchConjugation()">Pobierz</button>
+      </div>
+      <div class="conj-status" id="conj-status"></div>
+      <div class="conj-tenses" id="conj-tenses"></div>
+      <button class="conj-delete-btn" id="conj-delete-btn" style="display:none" onclick="deleteConjugation()">Usuń odmianę</button>
     </div>
     <div class="detail-btns">
       <button class="btn-edit" onclick="openEditFromDetail()">Edytuj</button>
@@ -771,7 +797,19 @@ function switchTab(name){
   });
   if(name==='gry')switchGra('quizpl');
   if(name==='fiszki')renderFiszki();
-  if(name==='slowka')switchSub('wszystkie');
+  if(name==='slowka'){
+    // upewnij się że sub-wszystkie jest aktywne i lista jest świeżo wyrenderowana
+    ['wszystkie','detail','kategorie','dodaj'].forEach(n=>{
+      const s=document.getElementById('sub-'+n);
+      if(s) s.classList.toggle('active', n==='wszystkie');
+    });
+    const slowka=document.getElementById('screen-slowka');
+    slowka.querySelectorAll('.smtab').forEach((t,i)=>{
+      t.classList.toggle('active', i===0);
+      t.style.display='';
+    });
+    renderWordList();
+  }
 }
 
 function switchGra(name){
@@ -791,9 +829,10 @@ document.getElementById('inp-es').addEventListener('keydown',e=>{if(e.key==='Ent
 document.getElementById('inp-cat').addEventListener('keydown',e=>{if(e.key==='Enter')addCat();});
 document.getElementById('nap-inp').addEventListener('keydown',e=>{if(e.key==='Enter')checkNapisz();});
 
+let showLearned=false,detailIdx=-1;
+
 load();
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
-let showLearned=false,detailIdx=-1;
 function switchSub(name){
   const slowka=document.getElementById('screen-slowka');
   const tabs=slowka.querySelectorAll('.smtab');
@@ -846,6 +885,7 @@ function openDetail(idx){
     srEl.innerHTML=diff<=0?'Gotowe do powtórki!':`Następna powtórka za <span>${days} ${days===1?'dzień':'dni'}</span>`;
   }
   document.getElementById('d-learned-btn').classList.toggle('on',!!w.learned);
+  renderConjugation(w);
   const slowka=document.getElementById('screen-slowka');
   slowka.querySelectorAll('.smtab').forEach(t=>t.style.display='none');
   document.querySelectorAll('.subscreen').forEach(s=>s.classList.remove('active'));
@@ -861,6 +901,143 @@ function toggleLearned(){
   const w=data.words[detailIdx];w.learned=!w.learned;
   document.getElementById('d-learned-btn').classList.toggle('on',w.learned);
   save();
+}
+
+// ─── KONIUGACJA ───────────────────────────────────────────────────
+const TENSE_NAMES = {
+  'Presente':               'Presente (teraźniejszy)',
+  'Pretérito perfecto simple': 'Indefinido (przeszły prosty)',
+  'Pretérito imperfecto':   'Imperfecto (przeszły opisowy)',
+  'Futuro':                 'Futuro (przyszły)',
+  'Condicional':            'Condicional (warunkowy)',
+};
+// Subjuntivo presente i Imperativo mają tę samą nazwę "Presente" / "Afirmativo"
+// więc rozróżniamy je po pozycji w tablicy (11 i 16 w kolejności Reverso)
+const TENSE_KEYS = Object.keys(TENSE_NAMES);
+const PERSONS = ['yo','tú','él/ella','nosotros','vosotros','ellos'];
+const PROXY = 'https://api.allorigins.win/raw?url=';
+
+function renderConjugation(w) {
+  const tenses = document.getElementById('conj-tenses');
+  const status = document.getElementById('conj-status');
+  const delBtn = document.getElementById('conj-delete-btn');
+  const fetchBtn = document.getElementById('conj-fetch-btn');
+  tenses.innerHTML = '';
+  status.textContent = '';
+  status.className = 'conj-status';
+
+  if (w.conjugation) {
+    delBtn.style.display = 'block';
+    fetchBtn.textContent = 'Pobierz ponownie';
+    const entries = Object.entries(w.conjugation);
+    if (!entries.length) { status.textContent = 'Brak zapisanych form.'; return; }
+    entries.forEach(([tense, forms]) => {
+      const block = document.createElement('div');
+      block.className = 'conj-tense-block';
+      const label = TENSE_NAMES[tense] || tense;
+      block.innerHTML = `<div class="conj-tense-name">${label.toUpperCase()}</div><div class="conj-forms">${
+        forms.map((f,i) => `<div class="conj-form"><span class="conj-person">${PERSONS[i]||''}</span><span class="conj-verb">${f}</span></div>`).join('')
+      }</div>`;
+      tenses.appendChild(block);
+    });
+  } else {
+    delBtn.style.display = 'none';
+    fetchBtn.textContent = 'Pobierz';
+    status.textContent = 'Brak odmiany. Kliknij "Pobierz" aby pobrać z Reverso.';
+  }
+}
+
+async function fetchConjugation() {
+  if (detailIdx === -1) return;
+  const w = data.words[detailIdx];
+  const verb = w.es.trim().toLowerCase();
+  const fetchBtn = document.getElementById('conj-fetch-btn');
+  const status = document.getElementById('conj-status');
+  const tenses = document.getElementById('conj-tenses');
+
+  fetchBtn.disabled = true;
+  fetchBtn.textContent = 'Pobieranie...';
+  status.textContent = '';
+  status.className = 'conj-status';
+  tenses.innerHTML = '';
+
+  const url = `https://conjugator.reverso.net/conjugation-spanish-verb-${encodeURIComponent(verb)}.html`;
+
+  try {
+    const res = await fetch(PROXY + encodeURIComponent(url), {
+      headers: { 'User-Agent': 'Mozilla/5.0' }
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const html = await res.text();
+
+    if (html.length < 1000) throw new Error('Pusta odpowiedź');
+
+    const result = parseReverso(html);
+
+    if (!result || !Object.keys(result).length) {
+      status.textContent = 'Nie znaleziono odmiany dla "' + verb + '". Sprawdź czy to poprawny czasownik.';
+      status.className = 'conj-status err';
+    } else {
+      w.conjugation = result;
+      save();
+      status.textContent = '✓ Pobrano ' + Object.keys(result).length + ' czasów.';
+      status.className = 'conj-status ok';
+      renderConjugation(w);
+    }
+  } catch(e) {
+    status.textContent = 'Błąd połączenia. Sprawdź internet i spróbuj ponownie.';
+    status.className = 'conj-status err';
+    console.error(e);
+  }
+
+  fetchBtn.disabled = false;
+  fetchBtn.textContent = w.conjugation ? 'Pobierz ponownie' : 'Pobierz';
+}
+
+function parseReverso(html) {
+  const result = {};
+  // Dopasuj bloki: nazwa czasu + lista form
+  const blockRe = /<p>([^<]+)<\/p><ul class="wrap-verbs-listing">([\s\S]*?)<\/ul>/g;
+  let match;
+  let blockIdx = 0;
+
+  while ((match = blockRe.exec(html)) !== null) {
+    const tenseName = match[1].trim();
+    const formsHtml = match[2];
+    const forms = [...formsHtml.matchAll(/<i class="verbtxt">([^<]+)<\/i>/g)].map(m => m[1]);
+    if (!forms.length || forms.length < 6) { blockIdx++; continue; }
+
+    // Indicativo: bloki 0=Presente, 1=Futuro, 2=Imperfecto, 9=Indefinido, 8=Condicional
+    // Subjuntivo: blok 10=Presente subjuntivo
+    // Imperativo: blok z "Afirmativo"
+    if (blockIdx === 0)  result['Presente'] = forms;
+    if (blockIdx === 2)  result['Pretérito imperfecto'] = forms;
+    if (blockIdx === 8)  result['Condicional'] = forms;
+    if (blockIdx === 9)  result['Pretérito perfecto simple'] = forms;
+    if (blockIdx === 1)  result['Futuro'] = forms;
+    if (blockIdx === 10) result['Presente subjuntivo'] = forms;
+
+    blockIdx++;
+  }
+
+  // Imperativo - szukamy osobno bo ma mniej form
+  const impRe = /<p>Afirmativo<\/p><ul class="wrap-verbs-listing">([\s\S]*?)<\/ul>/;
+  const impMatch = html.match(impRe);
+  if (impMatch) {
+    const impForms = [...impMatch[1].matchAll(/<i class="verbtxt">([^<]+)<\/i>/g)].map(m => m[1]);
+    if (impForms.length) result['Imperativo'] = impForms;
+  }
+
+  return result;
+}
+
+function deleteConjugation() {
+  if (detailIdx === -1) return;
+  const w = data.words[detailIdx];
+  if (!confirm('Usunąć zapisaną odmianę dla "' + w.es + '"?')) return;
+  delete w.conjugation;
+  save();
+  renderConjugation(w);
 }
 
 // KATEGORIE
