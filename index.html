@@ -915,7 +915,7 @@ const TENSE_NAMES = {
 // więc rozróżniamy je po pozycji w tablicy (11 i 16 w kolejności Reverso)
 const TENSE_KEYS = Object.keys(TENSE_NAMES);
 const PERSONS = ['yo','tú','él/ella','nosotros','vosotros','ellos'];
-const PROXY = 'https://api.allorigins.win/raw?url=';
+// WordReference ma natywny CORS - nie potrzebujemy proxy
 
 function renderConjugation(w) {
   const tenses = document.getElementById('conj-tenses');
@@ -961,18 +961,19 @@ async function fetchConjugation() {
   status.className = 'conj-status';
   tenses.innerHTML = '';
 
-  const url = `https://conjugator.reverso.net/conjugation-spanish-verb-${encodeURIComponent(verb)}.html`;
+  // UWAGA: Wpisz tu adres swojego Cloudflare Worker (patrz cloudflare-worker.js)
+  // Przykład: const WORKER_URL = 'https://fiszki-conj.twoja-nazwa.workers.dev';
+  const WORKER_URL = 'https://patient-art-df80.maciej-samokar.workers.dev';
+  const url = `${WORKER_URL}?v=${encodeURIComponent(verb)}`;
 
   try {
-    const res = await fetch(PROXY + encodeURIComponent(url), {
-      headers: { 'User-Agent': 'Mozilla/5.0' }
-    });
+    const res = await fetch(url);
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const html = await res.text();
 
     if (html.length < 1000) throw new Error('Pusta odpowiedź');
 
-    const result = parseReverso(html);
+    const result = parseWordRef(html);
 
     if (!result || !Object.keys(result).length) {
       status.textContent = 'Nie znaleziono odmiany dla "' + verb + '". Sprawdź czy to poprawny czasownik.';
@@ -994,42 +995,36 @@ async function fetchConjugation() {
   fetchBtn.textContent = w.conjugation ? 'Pobierz ponownie' : 'Pobierz';
 }
 
-function parseReverso(html) {
+function parseWordRef(html) {
   const result = {};
-  // Dopasuj bloki: nazwa czasu + lista form
+  // Parser dla Reverso Conjugator
   const blockRe = /<p>([^<]+)<\/p><ul class="wrap-verbs-listing">([\s\S]*?)<\/ul>/g;
-  let match;
-  let blockIdx = 0;
+  let blocks = [], m;
+  while ((m = blockRe.exec(html)) !== null) blocks.push(m);
 
-  while ((match = blockRe.exec(html)) !== null) {
-    const tenseName = match[1].trim();
-    const formsHtml = match[2];
-    const forms = [...formsHtml.matchAll(/<i class="verbtxt">([^<]+)<\/i>/g)].map(m => m[1]);
-    if (!forms.length || forms.length < 6) { blockIdx++; continue; }
+  const getforms = rowsHtml =>
+    [...rowsHtml.matchAll(/<i class="verbtxt">([^<]+)<\/i>/g)].map(x => x[1]);
 
-    // Indicativo: bloki 0=Presente, 1=Futuro, 2=Imperfecto, 9=Indefinido, 8=Condicional
-    // Subjuntivo: blok 10=Presente subjuntivo
-    // Imperativo: blok z "Afirmativo"
-    if (blockIdx === 0)  result['Presente'] = forms;
-    if (blockIdx === 2)  result['Pretérito imperfecto'] = forms;
-    if (blockIdx === 8)  result['Condicional'] = forms;
-    if (blockIdx === 9)  result['Pretérito perfecto simple'] = forms;
-    if (blockIdx === 1)  result['Futuro'] = forms;
-    if (blockIdx === 10) result['Presente subjuntivo'] = forms;
-
-    blockIdx++;
+  // Indicativo: blok 0=Presente, 1=Futuro, 2=Imperfecto, 8=Condicional, 9=Indefinido
+  // Subjuntivo: blok 10=Presente subj
+  const map = [[0,'Presente'],[2,'Pretérito imperfecto'],[9,'Pretérito perfecto simple'],[1,'Futuro'],[8,'Condicional'],[10,'Presente subjuntivo']];
+  for (const [idx, key] of map) {
+    if (blocks[idx]) {
+      const forms = getforms(blocks[idx][2]);
+      if (forms.length === 6) result[key] = forms;
+    }
   }
 
-  // Imperativo - szukamy osobno bo ma mniej form
-  const impRe = /<p>Afirmativo<\/p><ul class="wrap-verbs-listing">([\s\S]*?)<\/ul>/;
-  const impMatch = html.match(impRe);
-  if (impMatch) {
-    const impForms = [...impMatch[1].matchAll(/<i class="verbtxt">([^<]+)<\/i>/g)].map(m => m[1]);
+  // Imperativo
+  const impM = html.match(/<p>Afirmativo<\/p><ul class="wrap-verbs-listing">([\s\S]*?)<\/ul>/);
+  if (impM) {
+    const impForms = [...impM[1].matchAll(/<i class="verbtxt">([^<]+)<\/i>/g)].map(x => x[1]);
     if (impForms.length) result['Imperativo'] = impForms;
   }
 
   return result;
 }
+
 
 function deleteConjugation() {
   if (detailIdx === -1) return;
