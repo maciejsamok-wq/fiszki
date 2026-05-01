@@ -535,7 +535,7 @@ function renderAll(){
 // CAT BARS
 let fCat='__all__',qCat='__all__',qrCat='__all__',pCat='__all__',napCat='__all__',parCat='__all__';
 function renderCatBars(){
-  [['f',()=>fCat,v=>{fCat=v;fIdx=0;fFlipped=false;},renderFiszki],
+  [['f',()=>fCat,v=>{fCat=v;fIdx=0;fFlipped=false;fOrder=[];},renderFiszki],
    ['q',()=>qCat,v=>{qCat=v;},startQuiz],
    ['qr',()=>qrCat,v=>{qrCat=v;},startQuizR],
    ['p',()=>pCat,v=>{pCat=v;},startPrzezyj],
@@ -558,13 +558,22 @@ function renderCatBars(){
 }
 
 // FISZKI
-let fIdx=0,fFlipped=false;
+let fIdx=0,fFlipped=false,fOrder=[];
+
+function shuffleFiszki(){
+  const ws=fw(fCat,true);
+  fOrder=[...Array(ws.length).keys()].sort(()=>Math.random()-.5);
+  fIdx=0;fFlipped=false;
+}
+
 function renderFiszki(){
   const ws=fw(fCat,true),card=document.getElementById('fiszka'),fb=document.getElementById('f-fb'),empty=document.getElementById('f-empty');
   if(!ws.length){empty.style.display='flex';card.parentElement.style.display='none';fb.style.display='none';document.getElementById('f-ctr').textContent='0 / 0';document.getElementById('f-prog').style.width='0%';return;}
   empty.style.display='none';card.parentElement.style.display='';
-  if(fIdx>=ws.length)fIdx=0;
-  const w=ws[fIdx];
+  // jeśli brak kolejności lub nieaktualna - tasuj
+  if(!fOrder.length||fOrder.length!==ws.length) shuffleFiszki();
+  if(fIdx>=fOrder.length)fIdx=0;
+  const w=ws[fOrder[fIdx]];
   document.getElementById('f-front').textContent=w.pl;
   document.getElementById('f-back').textContent=w.es;
   document.getElementById('f-ctag').textContent=getCats(w).join(', ');
@@ -575,8 +584,8 @@ function renderFiszki(){
 }
 function flipCard(){fFlipped=!fFlipped;renderFiszki();}
 function cardFb(){fFlipped=false;nextCard();}
-function nextCard(){fFlipped=false;const ws=fw(fCat,true);fIdx=(fIdx+1)%ws.length;renderFiszki();}
-function prevCard(){fFlipped=false;const ws=fw(fCat,true);fIdx=(fIdx-1+ws.length)%ws.length;renderFiszki();}
+function nextCard(){fFlipped=false;fIdx=(fIdx+1)%fOrder.length;renderFiszki();}
+function prevCard(){fFlipped=false;fIdx=(fIdx-1+fOrder.length+1)%fOrder.length;renderFiszki();}
 
 // QUIZ PL->ES
 let qOrder=[],qIdx=0,qCorrect=0,qWords=[];
@@ -806,7 +815,7 @@ function switchTab(name){
     document.getElementById('screen-'+n).classList.toggle('active',n===name);
   });
   if(name==='gry')switchGra('quizpl');
-  if(name==='fiszki')renderFiszki();
+  if(name==='fiszki'){fOrder=[];renderFiszki();}
   if(name==='slowka'){
     // upewnij się że sub-wszystkie jest aktywne i lista jest świeżo wyrenderowana
     ['wszystkie','detail','kategorie','dodaj'].forEach(n=>{
@@ -1107,6 +1116,8 @@ function openDetailFromCat(idx, fromCat){
 }
 
 function closeCatDetail(){
+  document.getElementById('cat-detail-list').innerHTML='';
+  document.getElementById('cat-detail-empty').style.display='none';
   const slowka=document.getElementById('screen-slowka');
   slowka.querySelectorAll('.smtab').forEach(t=>t.style.display='');
   switchSub('kategorie');
