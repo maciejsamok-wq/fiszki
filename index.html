@@ -429,6 +429,7 @@
 
 <script>
 const SK = 'fiszki-v3';
+const OLD_KEYS = ['fiszki-cats-v2', 'fiszki-cats-v1', 'fiszki-v2'];
 let data = { cats: [], words: [] };
 let fIdx = 0, fFlipped = false, fCat = '__all__';
 let qOrder = [], qIdx = 0, qCorrect = 0, qAnswered = false, qCat = '__all__';
@@ -436,7 +437,17 @@ let qOrder = [], qIdx = 0, qCorrect = 0, qAnswered = false, qCat = '__all__';
 function save() { try { localStorage.setItem(SK, JSON.stringify(data)); } catch(e) {} }
 
 function load() {
-  try { const d = localStorage.getItem(SK); if (d) data = JSON.parse(d); } catch(e) {}
+  try {
+    const d = localStorage.getItem(SK);
+    if (d) { data = JSON.parse(d); }
+    else {
+      // migracja ze starszych kluczy
+      for (const oldKey of OLD_KEYS) {
+        const old = localStorage.getItem(oldKey);
+        if (old) { data = JSON.parse(old); save(); break; }
+      }
+    }
+  } catch(e) {}
   if (!data.cats.length) {
     data.cats = ['Podstawowe', 'Kolory', 'Liczby'];
     data.words = [
@@ -694,7 +705,7 @@ function saveEdit() {
   save(); renderAll(); closeEditModal();
 }
 
-
+function addWord() {
   const pl = document.getElementById('inp-pl').value.trim();
   const es = document.getElementById('inp-es').value.trim();
   const checked = [...document.querySelectorAll('#inp-cats-check input:checked')].map(cb => cb.value);
