@@ -165,7 +165,14 @@
     .cat-check-item span{font-family:'Inter',sans-serif;font-size:14px;color:var(--text)}
     .primary-btn{width:100%;padding:13px;border-radius:var(--radius);border:none;background:var(--accent);color:#0f0f1a;font-family:'Inter',sans-serif;font-size:15px;font-weight:800;cursor:pointer;margin-bottom:4px;flex-shrink:0}
     .primary-btn:active{opacity:.85}
-    /* NAPISZ */
+    /* WYBÓR GRY */
+    .gry-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;flex-shrink:0}
+    .gra-tile{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 12px;text-align:left;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;gap:6px}
+    .gra-tile:active{background:var(--surface2);border-color:var(--accent)}
+    .gra-tile-icon{font-size:24px;line-height:1}
+    .gra-tile-name{font-size:14px;font-weight:700;color:var(--text)}
+    .gra-tile-desc{font-size:11px;color:var(--muted);line-height:1.4}
+    .config-title{font-size:20px;font-weight:700;margin-bottom:20px;flex-shrink:0}
     .nap-input{flex:1;padding:11px 13px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Inter',sans-serif;font-size:16px;outline:none}
     .nap-input:focus{border-color:var(--accent)}
     .nap-input::placeholder{color:var(--muted)}
@@ -241,20 +248,60 @@
 
 <!-- QUIZ / GRY -->
 <div class="screen" id="screen-gry">
-  <div class="submenu" id="gry-submenu" style="overflow-x:auto;flex-wrap:nowrap;gap:5px">
-    <button class="smtab active" id="gtab-quizpl" onclick="switchGra('quizpl')">PL→ES</button>
-    <button class="smtab" id="gtab-quizes" onclick="switchGra('quizes')">ES→PL</button>
-    <button class="smtab" id="gtab-przezyj" onclick="switchGra('przezyj')">Przeżyj</button>
-    <button class="smtab" id="gtab-napisz" onclick="switchGra('napisz')">Napisz</button>
-    <button class="smtab" id="gtab-pary" onclick="switchGra('pary')">Pary</button>
-    <button class="smtab" id="gtab-odmiana" onclick="switchGra('odmiana')">Odmiana</button>
+
+  <!-- WYBÓR GRY -->
+  <div class="subscreen active" id="gsub-wybor">
+    <div class="sec-lbl" style="margin-bottom:12px">WYBIERZ GRĘ</div>
+    <div class="gry-grid">
+      <button class="gra-tile" onclick="openGraConfig('quizpl')">
+        <div class="gra-tile-icon">🎯</div>
+        <div class="gra-tile-name">Quiz PL→ES</div>
+        <div class="gra-tile-desc">Przetłumacz słówko na hiszpański</div>
+      </button>
+      <button class="gra-tile" onclick="openGraConfig('quizes')">
+        <div class="gra-tile-icon">🔄</div>
+        <div class="gra-tile-name">Quiz ES→PL</div>
+        <div class="gra-tile-desc">Przetłumacz słówko na polski</div>
+      </button>
+      <button class="gra-tile" onclick="openGraConfig('przezyj')">
+        <div class="gra-tile-icon">❤️</div>
+        <div class="gra-tile-name">Przeżyj</div>
+        <div class="gra-tile-desc">3 serca – 20 najtrudniejszych słówek</div>
+      </button>
+      <button class="gra-tile" onclick="openGraConfig('napisz')">
+        <div class="gra-tile-icon">✍️</div>
+        <div class="gra-tile-name">Napisz</div>
+        <div class="gra-tile-desc">Wpisz tłumaczenie z klawiatury</div>
+      </button>
+      <button class="gra-tile" onclick="openGraConfig('pary')">
+        <div class="gra-tile-icon">🃏</div>
+        <div class="gra-tile-name">Pary</div>
+        <div class="gra-tile-desc">Połącz pasujące karty PL i ES</div>
+      </button>
+      <button class="gra-tile" onclick="openGraConfig('odmiana')">
+        <div class="gra-tile-icon">📖</div>
+        <div class="gra-tile-name">Odmiana</div>
+        <div class="gra-tile-desc">Ćwicz formy czasowników</div>
+      </button>
+    </div>
+  </div>
+
+  <!-- KONFIGURACJA GRY -->
+  <div class="subscreen" id="gsub-config">
+    <button class="detail-back" onclick="backToWybor()">&#8592; Wybór gry</button>
+    <div class="config-title" id="config-title"></div>
+    <div class="sec-lbl" style="margin-bottom:8px">KATEGORIA</div>
+    <div class="cat-bar" id="config-cats" style="margin-bottom:16px"></div>
+    <div id="config-tenses-section" style="display:none">
+      <div class="sec-lbl" style="margin-bottom:8px">CZASY</div>
+      <div class="cat-bar" id="config-tenses" style="margin-bottom:16px"></div>
+    </div>
+    <button class="primary-btn" id="config-start-btn" onclick="launchGra()">Zagraj &#8594;</button>
   </div>
 
   <!-- QUIZ PL->ES -->
-  <div class="subscreen active" id="gsub-quizpl">
-    <div class="sec-lbl">KATEGORIA</div>
-    <div class="cat-bar" id="q-cats"></div>
-    <div class="divider"></div>
+  <div class="subscreen" id="gsub-quizpl">
+    <button class="detail-back" onclick="backToWybor()">&#8592; Wybór gry</button>
     <div class="prog"><div class="prog-fill" id="q-prog"></div></div>
     <div id="quiz-main">
       <div class="quiz-q">
@@ -274,9 +321,7 @@
 
   <!-- QUIZ ES->PL -->
   <div class="subscreen" id="gsub-quizes">
-    <div class="sec-lbl">KATEGORIA</div>
-    <div class="cat-bar" id="qr-cats"></div>
-    <div class="divider"></div>
+    <button class="detail-back" onclick="backToWybor()">&#8592; Wybór gry</button>
     <div class="prog"><div class="prog-fill" id="qr-prog"></div></div>
     <div id="quizr-main">
       <div class="quiz-q">
@@ -296,17 +341,14 @@
 
   <!-- PRZEZYJ -->
   <div class="subscreen" id="gsub-przezyj">
-    <div class="sec-lbl">KATEGORIA</div>
-    <div class="cat-bar" id="p-cats"></div>
-    <div class="divider"></div>
+    <button class="detail-back" onclick="backToWybor()">&#8592; Wybór gry</button>
     <div class="lives-row" id="p-lives"></div>
     <div class="prog"><div class="prog-fill" id="p-prog"></div></div>
     <div id="przezyj-main">
       <div class="quiz-q">
-        <div class="quiz-q-lang" id="p-qlang">PRZETŁUMACZ NA ESPAÑOL</div>
+        <div class="quiz-q-lang">PRZETŁUMACZ NA ESPAÑOL</div>
         <div class="quiz-q-word" id="p-word">--</div>
       </div>
-      <div style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:10px;flex-shrink:0">20 najtrudniejszych słówek</div>
       <div class="opts" id="p-opts"></div>
       <button class="quiz-next" id="p-next" onclick="nextP()">Następne &#8594;</button>
     </div>
@@ -320,20 +362,18 @@
 
   <!-- NAPISZ -->
   <div class="subscreen" id="gsub-napisz">
-    <div class="sec-lbl">KATEGORIA</div>
-    <div class="cat-bar" id="nap-cats"></div>
-    <div class="divider"></div>
+    <button class="detail-back" onclick="backToWybor()">&#8592; Wybór gry</button>
     <div class="prog"><div class="prog-fill" id="nap-prog"></div></div>
     <div id="napisz-main">
       <div class="quiz-q">
-        <div class="quiz-q-lang">WPISZ PO HISZPAŃSKU</div>
+        <div class="quiz-q-lang">NAPISZ PO HISZPAŃSKU</div>
         <div class="quiz-q-word" id="nap-word">--</div>
       </div>
       <div style="display:flex;gap:8px;margin-bottom:12px;flex-shrink:0">
-        <input id="nap-inp" class="nap-input" placeholder="napisz po hiszpańsku..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+        <input class="nap-input" id="nap-inp" placeholder="wpisz po hiszpańsku..." />
         <button class="nap-submit" onclick="checkNapisz()">OK</button>
       </div>
-      <div id="nap-feedback" class="nap-feedback" style="display:none"></div>
+      <div class="nap-feedback" id="nap-feedback" style="display:none"></div>
       <button class="quiz-next" id="nap-next" onclick="nextNapisz()" style="display:none">Następne &#8594;</button>
     </div>
     <div class="quiz-result" id="napisz-result">
@@ -341,16 +381,28 @@
       <div class="r-label" id="nap-label"></div>
       <button class="r-replay" onclick="startNapisz()">Zagraj ponownie</button>
     </div>
-    <div class="empty-st" id="nap-empty" style="display:none">Potrzebujesz minimum 2 słówek</div>
+    <div class="empty-st" id="nap-empty" style="display:none">Brak słówek</div>
   </div>
 
   <!-- PARY -->
+  <div class="subscreen" id="gsub-pary">
+    <button class="detail-back" onclick="backToWybor()">&#8592; Wybór gry</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-shrink:0">
+      <div style="font-size:13px;color:var(--muted)" id="par-status">Wybierz dwie pasujące karty</div>
+      <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)" id="par-pairs">0/0</div>
+    </div>
+    <div class="pary-grid" id="par-grid"></div>
+    <div class="quiz-result" id="pary-result">
+      <div class="r-score" id="par-score"></div>
+      <div class="r-label" id="par-label"></div>
+      <button class="r-replay" onclick="startPary()">Zagraj ponownie</button>
+    </div>
+    <div class="empty-st" id="par-empty" style="display:none">Potrzebujesz minimum 4 słówek</div>
+  </div>
+
+  <!-- ODMIANA -->
   <div class="subscreen" id="gsub-odmiana">
-    <div class="sec-lbl">KATEGORIA</div>
-    <div class="cat-bar" id="odm-cats"></div>
-    <div class="divider"></div>
-    <div class="sec-lbl" style="margin-bottom:6px">CZASY</div>
-    <div class="cat-bar" id="odm-tense-bar" style="margin-bottom:14px"></div>
+    <button class="detail-back" onclick="backToWybor()">&#8592; Wybór gry</button>
     <div class="prog"><div class="prog-fill" id="odm-prog"></div></div>
     <div id="odmiana-main">
       <div class="quiz-q">
@@ -368,6 +420,7 @@
     </div>
     <div class="empty-st" id="odm-empty" style="display:none">Brak czasowników z pobranymi odmianami w tej kategorii</div>
   </div>
+
 </div>
 
 <!-- SLOWKA -->
@@ -543,25 +596,18 @@ function renderAll(){
 // CAT BARS
 let fCat='__all__',qCat='__all__',qrCat='__all__',pCat='__all__',napCat='__all__',parCat='__all__';
 function renderCatBars(){
-  [['f',()=>fCat,v=>{fCat=v;fIdx=0;fFlipped=false;fOrder=[];},renderFiszki],
-   ['q',()=>qCat,v=>{qCat=v;},startQuiz],
-   ['qr',()=>qrCat,v=>{qrCat=v;},startQuizR],
-   ['p',()=>pCat,v=>{pCat=v;},startPrzezyj],
-   ['nap',()=>napCat,v=>{napCat=v;},startNapisz],
-   ['par',()=>parCat,v=>{parCat=v;},startPary],
-  ].forEach(([prefix,getAc,setAc,onSelect])=>{
-    const bar=document.getElementById(prefix+'-cats');if(!bar)return;
-    const ac=getAc();bar.innerHTML='';
-    const all=document.createElement('button');
-    all.className='cat-pill'+(ac==='__all__'?' active':'');all.textContent='Wszystkie';
-    all.onclick=()=>{setAc('__all__');renderAll();onSelect();};
-    bar.appendChild(all);
-    data.cats.forEach(cat=>{
-      const btn=document.createElement('button');
-      btn.className='cat-pill'+(ac===cat?' active':'');btn.textContent=cat;
-      btn.onclick=()=>{setAc(cat);renderAll();onSelect();};
-      bar.appendChild(btn);
-    });
+  // tylko Fiszki mają pasek kategorii - Quiz używa ekranu konfiguracji
+  const bar=document.getElementById('f-cats');if(!bar)return;
+  const ac=fCat;bar.innerHTML='';
+  const all=document.createElement('button');
+  all.className='cat-pill'+(ac==='__all__'?' active':'');all.textContent='Wszystkie';
+  all.onclick=()=>{fCat='__all__';fIdx=0;fFlipped=false;fOrder=[];renderAll();};
+  bar.appendChild(all);
+  data.cats.forEach(cat=>{
+    const btn=document.createElement('button');
+    btn.className='cat-pill'+(ac===cat?' active':'');btn.textContent=cat;
+    btn.onclick=()=>{fCat=cat;fIdx=0;fFlipped=false;fOrder=[];renderAll();};
+    bar.appendChild(btn);
   });
 }
 
@@ -822,7 +868,7 @@ function switchTab(name){
     document.querySelectorAll('.tab')[i].classList.toggle('active',n===name);
     document.getElementById('screen-'+n).classList.toggle('active',n===name);
   });
-  if(name==='gry')switchGra('quizpl');
+  if(name==='gry') showGsub('wybor');
   if(name==='fiszki'){fOrder=[];renderFiszki();}
   if(name==='slowka'){
     window._detailFromCat=null;
@@ -854,39 +900,6 @@ const ODM_PERSONS = ['yo','tú','él/ella','nosotros','vosotros','ellos'];
 let odmCat='__all__', odmTenses=new Set(ODM_TENSES.map(t=>t.key));
 let odmQuestions=[], odmIdx=0, odmCorrect=0;
 
-function renderOdmCatBar(){
-  const bar=document.getElementById('odm-cats');
-  bar.innerHTML='';
-  const all=document.createElement('button');
-  all.className='cat-pill'+(odmCat==='__all__'?' active':'');
-  all.textContent='Wszystkie';
-  all.onclick=()=>{odmCat='__all__';renderOdmCatBar();startOdmiana();};
-  bar.appendChild(all);
-  data.cats.forEach(cat=>{
-    const btn=document.createElement('button');
-    btn.className='cat-pill'+(odmCat===cat?' active':'');
-    btn.textContent=cat;
-    btn.onclick=()=>{odmCat=cat;renderOdmCatBar();startOdmiana();};
-    bar.appendChild(btn);
-  });
-}
-
-function renderOdmTenseBar(){
-  const bar=document.getElementById('odm-tense-bar');
-  bar.innerHTML='';
-  ODM_TENSES.forEach(t=>{
-    const btn=document.createElement('button');
-    btn.className='cat-pill'+(odmTenses.has(t.key)?' active':'');
-    btn.textContent=t.label;
-    btn.onclick=()=>{
-      if(odmTenses.has(t.key)){if(odmTenses.size>1)odmTenses.delete(t.key);}
-      else odmTenses.add(t.key);
-      renderOdmTenseBar();startOdmiana();
-    };
-    bar.appendChild(btn);
-  });
-}
-
 function buildOdmQuestions(){
   // zbierz wszystkie czasowniki z odmianą w wybranej kategorii
   const ws = (odmCat==='__all__' ? data.words : data.words.filter(w=>getCats(w).includes(odmCat)))
@@ -907,8 +920,6 @@ function buildOdmQuestions(){
 }
 
 function startOdmiana(){
-  renderOdmCatBar();
-  renderOdmTenseBar();
   const empty=document.getElementById('odm-empty');
   const main=document.getElementById('odmiana-main');
   const result=document.getElementById('odmiana-result');
@@ -963,17 +974,95 @@ function renderOdm(){
 }
 function nextOdm(){odmIdx++;renderOdm();}
 
-function switchGra(name){
-  ['quizpl','quizes','przezyj','napisz','pary','odmiana'].forEach(n=>{
-    document.getElementById('gtab-'+n).classList.toggle('active',n===name);
-    document.getElementById('gsub-'+n).classList.toggle('active',n===name);
+// GRA CONFIG
+let currentGra = null;
+let configCat = '__all__';
+
+function openGraConfig(name){
+  currentGra = name;
+  configCat = '__all__';
+
+  // tytuł
+  const titles = {quizpl:'Quiz PL→ES',quizes:'Quiz ES→PL',przezyj:'Przeżyj',napisz:'Napisz',pary:'Pary',odmiana:'Odmiana wybór'};
+  document.getElementById('config-title').textContent = titles[name] || name;
+
+  // pasek kategorii
+  renderConfigCatBar();
+
+  // czasy tylko dla odmiany
+  const tenseSec = document.getElementById('config-tenses-section');
+  if(name === 'odmiana'){
+    tenseSec.style.display = '';
+    renderConfigTenseBar();
+  } else {
+    tenseSec.style.display = 'none';
+  }
+
+  // pokaż ekran konfiguracji
+  showGsub('config');
+}
+
+function renderConfigCatBar(){
+  const bar = document.getElementById('config-cats');
+  bar.innerHTML = '';
+  const all = document.createElement('button');
+  all.className = 'cat-pill' + (configCat === '__all__' ? ' active' : '');
+  all.textContent = 'Wszystkie';
+  all.onclick = () => { configCat = '__all__'; renderConfigCatBar(); };
+  bar.appendChild(all);
+  data.cats.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-pill' + (configCat === cat ? ' active' : '');
+    btn.textContent = cat;
+    btn.onclick = () => { configCat = cat; renderConfigCatBar(); };
+    bar.appendChild(btn);
   });
-  if(name==='quizpl')startQuiz();
-  if(name==='quizes')startQuizR();
-  if(name==='przezyj')startPrzezyj();
-  if(name==='napisz')startNapisz();
-  if(name==='pary')startPary();
-  if(name==='odmiana')startOdmiana();
+}
+
+function renderConfigTenseBar(){
+  const bar = document.getElementById('config-tenses');
+  bar.innerHTML = '';
+  ODM_TENSES.forEach(t => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-pill' + (odmTenses.has(t.key) ? ' active' : '');
+    btn.textContent = t.label;
+    btn.onclick = () => {
+      if(odmTenses.has(t.key)){ if(odmTenses.size > 1) odmTenses.delete(t.key); }
+      else odmTenses.add(t.key);
+      renderConfigTenseBar();
+    };
+    bar.appendChild(btn);
+  });
+}
+
+function launchGra(){
+  // przekaż wybraną kategorię do odpowiedniej gry
+  qCat = configCat; qrCat = configCat; pCat = configCat;
+  napCat = configCat; parCat = configCat; odmCat = configCat;
+
+  showGsub(currentGra);
+  if(currentGra === 'quizpl') startQuiz();
+  if(currentGra === 'quizes') startQuizR();
+  if(currentGra === 'przezyj') startPrzezyj();
+  if(currentGra === 'napisz') startNapisz();
+  if(currentGra === 'pary') startPary();
+  if(currentGra === 'odmiana') startOdmiana();
+}
+
+function backToWybor(){
+  showGsub('wybor');
+}
+
+function showGsub(name){
+  ['wybor','config','quizpl','quizes','przezyj','napisz','pary','odmiana'].forEach(n => {
+    const el = document.getElementById('gsub-' + n);
+    if(el) el.classList.toggle('active', n === name);
+  });
+}
+
+function switchGra(name){
+  // zachowane dla kompatybilności - teraz używamy showGsub
+  showGsub(name);
 }
 
 document.getElementById('inp-pl').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('inp-es').focus();});
