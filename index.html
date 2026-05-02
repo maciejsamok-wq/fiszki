@@ -84,8 +84,8 @@
     .submenu{display:flex;gap:6px;margin-bottom:16px;flex-shrink:0}
     .smtab{flex:1;padding:8px 4px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Inter',sans-serif;font-size:12px;font-weight:500;cursor:pointer}
     .smtab.active{background:var(--surface2);color:var(--text);border-color:var(--muted);font-weight:600}
-    .subscreen{display:none;flex-direction:column;flex:1;min-height:0}
-    .subscreen.active{display:flex}
+    .subscreen{display:none;flex-direction:column;flex:1;min-height:0;overflow:hidden}
+    .subscreen.active{display:flex;overflow-y:auto}
     .wlist{display:flex;flex-direction:column;gap:7px}
     .witem{display:flex;align-items:center;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:12px;gap:10px;cursor:pointer;transition:background .15s}
     .witem:active{background:var(--surface2)}
@@ -1285,12 +1285,17 @@ load();
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
 function switchSub(name){
   ['wybor-slowka','wszystkie','detail','kategorie','dodaj','cat-detail','pobierz'].forEach(n=>{
-    const s=document.getElementById('sub-'+n);if(s)s.classList.toggle('active',n===name);
+    const s=document.getElementById('sub-'+n);
+    if(s) s.classList.toggle('active',n===name);
   });
   if(name==='wszystkie')renderWordList();
   if(name==='kategorie')renderCatMgmt();
   if(name==='dodaj')renderAddCats('inp-cats-check',[]);
-  if(name==='wybor-slowka')updateWyborSlowkaDesc();
+  if(name==='wybor-slowka'){
+    updateWyborSlowkaDesc();
+    // czyść listy żeby nie zostawały szczątki
+    document.getElementById('pobierz-list').innerHTML='';
+  }
   if(name==='pobierz')loadPobierzList();
 }
 function toggleShowLearned(){
