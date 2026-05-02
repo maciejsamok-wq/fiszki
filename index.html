@@ -92,6 +92,7 @@
     .witem-word{flex:1;font-size:15px;font-weight:500;color:var(--text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
     .witem-pct{font-family:'DM Mono',monospace;font-size:12px;flex-shrink:0}
     .witem-learned{font-size:14px;flex-shrink:0}
+    .witem-conj{font-size:11px;flex-shrink:0}
     .pct-good{color:var(--green)}.pct-mid{color:var(--orange)}.pct-bad{color:var(--red)}.pct-none{color:var(--muted)}
     .show-learned-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-shrink:0}
     .toggle-btn{position:relative;width:40px;height:22px;background:var(--border);border-radius:11px;border:none;cursor:pointer;transition:background .2s;flex-shrink:0}
@@ -182,8 +183,8 @@
     .nap-feedback.typo{background:rgba(251,146,60,.12);border:1px solid var(--orange);color:var(--orange)}
     .nap-feedback.wrong{background:rgba(248,113,113,.15);border:1px solid var(--red);color:var(--red)}
     /* PARY */
-    .pary-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;flex-shrink:0}
-    .par-card{padding:8px 6px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:'Inter',sans-serif;font-size:12px;cursor:pointer;text-align:center;line-height:1.3;transition:all .15s;min-height:42px;display:flex;align-items:center;justify-content:center}
+    .pary-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;flex-shrink:0}
+    .par-card{padding:11px 8px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:'Inter',sans-serif;font-size:13px;cursor:pointer;text-align:center;line-height:1.3;transition:all .15s;min-height:46px;display:flex;align-items:center;justify-content:center}
     .par-card:active{opacity:.8}
     .par-card.selected{border-color:var(--accent);background:rgba(232,197,71,.12);color:var(--accent)}
     .par-card.matched{border-color:var(--green);background:rgba(74,222,128,.12);color:var(--green);cursor:default;opacity:.6}
@@ -295,6 +296,10 @@
     <div id="config-tenses-section" style="display:none">
       <div class="sec-lbl" style="margin-bottom:8px">CZASY</div>
       <div class="cat-bar" id="config-tenses" style="margin-bottom:16px"></div>
+      <div class="show-learned-row" style="margin-bottom:16px">
+        <button class="toggle-btn on" id="odm-hint-btn" onclick="toggleOdmHint()"></button>
+        <span class="toggle-lbl">Podpowiedź (forma ES)</span>
+      </div>
     </div>
     <button class="primary-btn" id="config-start-btn" onclick="launchGra()">Zagraj &#8594;</button>
   </div>
@@ -817,7 +822,7 @@ function nextNapisz(){napIdx++;renderNapisz();}
 let parSelected=null,parMatched=0,parTotal=0,parMoves=0;
 function startPary(){
   const all=fw(parCat,false);
-  const ws=all.sort(()=>Math.random()-.5).slice(0,6);
+  const ws=all.sort(()=>Math.random()-.5).slice(0,8);
   const empty=document.getElementById('par-empty'),grid=document.getElementById('par-grid'),result=document.getElementById('pary-result');
   result.style.display='none';grid.style.display='';
   if(all.length<4){empty.style.display='flex';grid.style.display='none';return;}
@@ -897,8 +902,13 @@ const ODM_TENSES = [
 ];
 const ODM_PERSONS = ['yo','tú','él/ella','nosotros','vosotros','ellos'];
 
-let odmCat='__all__', odmTenses=new Set(ODM_TENSES.map(t=>t.key));
+let odmCat='__all__', odmTenses=new Set(ODM_TENSES.map(t=>t.key)), odmHint=true;
 let odmQuestions=[], odmIdx=0, odmCorrect=0;
+
+function toggleOdmHint(){
+  odmHint=!odmHint;
+  document.getElementById('odm-hint-btn').classList.toggle('on',odmHint);
+}
 
 function buildOdmQuestions(){
   // zbierz wszystkie czasowniki z odmianą w wybranej kategorii
@@ -945,17 +955,48 @@ function renderOdm(){
   const q=odmQuestions[odmIdx];
   document.getElementById('odm-tense-label').textContent=q.tenseLabel.toUpperCase();
   document.getElementById('odm-person-label').textContent=ODM_PERSONS[q.personIdx]||'';
-  document.getElementById('odm-verb').textContent=q.word.pl+' ('+q.word.es+')';
+  document.getElementById('odm-verb').textContent = odmHint
+    ? q.word.pl + ' (' + q.word.es + ')'
+    : q.word.pl;
 
-  // dystraktorzy: inne formy tego samego czasownika + formy innych czasowników
-  const distractors=new Set();
-  // inne osoby tego samego czasu
-  const sameTenseForms=q.word.conjugation[q.tense]||[];
-  sameTenseForms.forEach((f,i)=>{if(i!==q.personIdx&&f&&f!==q.correct)distractors.add(f);});
-  // formy z innych czasowników
-  odmQuestions.forEach(oq=>{if(oq.correct!==q.correct)distractors.add(oq.correct);});
-  const dis=[...distractors].sort(()=>Math.random()-.5).slice(0,3);
-  const opts=[...dis,q.correct].sort(()=>Math.random()-.5);
+  // Dystraktorzy - zawsze z tego samego czasu żeby było trudno
+  const distractors = new Set();
+
+  // 1. Inne osoby tego samego czasu i tego samego czasownika
+  const sameTenseForms = q.word.conjugation[q.tense] || [];
+  sameTenseForms.forEach((f,i) => { if(i !== q.personIdx && f && f !== q.correct) distractors.add(f); });
+
+  // 2. Inne osoby tego samego czasownika, ale w innych czasach
+  if(distractors.size < 3){
+    Object.entries(q.word.conjugation).forEach(([tense, forms]) => {
+      if(tense === q.tense) return;
+      forms.forEach((f,i) => { if(i !== q.personIdx && f && f !== q.correct) distractors.add(f); });
+    });
+  }
+
+  // 3. Ten sam czas, ta sama osoba, inne czasowniki
+  if(distractors.size < 3){
+    odmQuestions.forEach(oq => {
+      if(oq.tense === q.tense && oq.personIdx === q.personIdx && oq.correct !== q.correct)
+        distractors.add(oq.correct);
+    });
+  }
+
+  // 4. Ten sam czas, inne osoby, inne czasowniki
+  if(distractors.size < 3){
+    odmQuestions.forEach(oq => {
+      if(oq.tense === q.tense && oq.correct !== q.correct)
+        distractors.add(oq.correct);
+    });
+  }
+
+  // 5. Fallback - cokolwiek
+  if(distractors.size < 3){
+    odmQuestions.forEach(oq => { if(oq.correct !== q.correct) distractors.add(oq.correct); });
+  }
+
+  const dis = [...distractors].filter(f => f !== q.correct).sort(() => Math.random() - .5).slice(0,3);
+  const opts = [...dis, q.correct].sort(() => Math.random() - .5);
 
   const grid=document.getElementById('odm-opts');
   grid.innerHTML='';
@@ -1102,7 +1143,7 @@ function renderWordList(){
     let pctClass='pct-none',pctTxt='--';
     if(p!==null){pctTxt=p+'%';pctClass=p>=80?'pct-good':p>=50?'pct-mid':'pct-bad';}
     const el=document.createElement('div');el.className='witem';
-    el.innerHTML=`<span class="witem-word">${w.es}</span><span class="witem-pct ${pctClass}">${pctTxt}</span>${w.learned?'<span class="witem-learned" title="Nauczone">✓</span>':''}`;
+    el.innerHTML=`<span class="witem-word">${w.es}</span>${w.conjugation?'<span class="witem-conj" title="Odmiana pobrana">🟢</span>':''}<span class="witem-pct ${pctClass}">${pctTxt}</span>${w.learned?'<span class="witem-learned" title="Nauczone">✓</span>':''}`;
     el.onclick=()=>openDetail(realIdx);
     list.appendChild(el);
   });
@@ -1313,7 +1354,7 @@ function openCatDetail(cat){
       let pctClass='pct-none',pctTxt='--';
       if(p!==null){pctTxt=p+'%';pctClass=p>=80?'pct-good':p>=50?'pct-mid':'pct-bad';}
       const el=document.createElement('div');el.className='witem';
-      el.innerHTML=`<span class="witem-word">${w.es}</span><span class="witem-pct ${pctClass}">${pctTxt}</span>${w.learned?'<span class="witem-learned">✓</span>':''}`;
+      el.innerHTML=`<span class="witem-word">${w.es}</span>${w.conjugation?'<span class="witem-conj" title="Odmiana pobrana">🟢</span>':''}<span class="witem-pct ${pctClass}">${pctTxt}</span>${w.learned?'<span class="witem-learned">✓</span>':''}`;
       el.onclick=()=>openDetailFromCat(realIdx,cat);
       list.appendChild(el);
     });
