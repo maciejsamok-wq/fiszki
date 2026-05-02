@@ -247,6 +247,7 @@
     <button class="smtab" id="gtab-przezyj" onclick="switchGra('przezyj')">Przeżyj</button>
     <button class="smtab" id="gtab-napisz" onclick="switchGra('napisz')">Napisz</button>
     <button class="smtab" id="gtab-pary" onclick="switchGra('pary')">Pary</button>
+    <button class="smtab" id="gtab-odmiana" onclick="switchGra('odmiana')">Odmiana</button>
   </div>
 
   <!-- QUIZ PL->ES -->
@@ -344,21 +345,28 @@
   </div>
 
   <!-- PARY -->
-  <div class="subscreen" id="gsub-pary">
+  <div class="subscreen" id="gsub-odmiana">
     <div class="sec-lbl">KATEGORIA</div>
-    <div class="cat-bar" id="par-cats"></div>
+    <div class="cat-bar" id="odm-cats"></div>
     <div class="divider"></div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-shrink:0">
-      <div style="font-size:13px;color:var(--muted)" id="par-status">Wybierz dwie pasujące karty</div>
-      <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)" id="par-pairs">0/0</div>
+    <div class="sec-lbl" style="margin-bottom:6px">CZASY</div>
+    <div class="cat-bar" id="odm-tense-bar" style="margin-bottom:14px"></div>
+    <div class="prog"><div class="prog-fill" id="odm-prog"></div></div>
+    <div id="odmiana-main">
+      <div class="quiz-q">
+        <div class="quiz-q-lang" id="odm-tense-label">PRESENTE</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:6px" id="odm-person-label">yo</div>
+        <div class="quiz-q-word" id="odm-verb">--</div>
+      </div>
+      <div class="opts" id="odm-opts"></div>
+      <button class="quiz-next" id="odm-next" onclick="nextOdm()">Następne &#8594;</button>
     </div>
-    <div class="pary-grid" id="par-grid"></div>
-    <div class="quiz-result" id="pary-result">
-      <div class="r-score" id="par-score"></div>
-      <div class="r-label" id="par-label"></div>
-      <button class="r-replay" onclick="startPary()">Zagraj ponownie</button>
+    <div class="quiz-result" id="odmiana-result">
+      <div class="r-score" id="odm-score"></div>
+      <div class="r-label" id="odm-label"></div>
+      <button class="r-replay" onclick="startOdmiana()">Zagraj ponownie</button>
     </div>
-    <div class="empty-st" id="par-empty" style="display:none">Potrzebujesz minimum 4 słówek</div>
+    <div class="empty-st" id="odm-empty" style="display:none">Brak czasowników z pobranymi odmianami w tej kategorii</div>
   </div>
 </div>
 
@@ -831,8 +839,132 @@ function switchTab(name){
   }
 }
 
+// ODMIANA WYBÓR
+const ODM_TENSES = [
+  { key: 'Presente',                 label: 'Presente' },
+  { key: 'Pretérito perfecto simple',label: 'Indefinido' },
+  { key: 'Pretérito imperfecto',     label: 'Imperfecto' },
+  { key: 'Futuro',                   label: 'Futuro' },
+  { key: 'Condicional',              label: 'Condicional' },
+  { key: 'Presente subjuntivo',      label: 'Subjuntivo' },
+  { key: 'Imperativo',               label: 'Imperativo' },
+];
+const ODM_PERSONS = ['yo','tú','él/ella','nosotros','vosotros','ellos'];
+
+let odmCat='__all__', odmTenses=new Set(ODM_TENSES.map(t=>t.key));
+let odmQuestions=[], odmIdx=0, odmCorrect=0;
+
+function renderOdmCatBar(){
+  const bar=document.getElementById('odm-cats');
+  bar.innerHTML='';
+  const all=document.createElement('button');
+  all.className='cat-pill'+(odmCat==='__all__'?' active':'');
+  all.textContent='Wszystkie';
+  all.onclick=()=>{odmCat='__all__';renderOdmCatBar();startOdmiana();};
+  bar.appendChild(all);
+  data.cats.forEach(cat=>{
+    const btn=document.createElement('button');
+    btn.className='cat-pill'+(odmCat===cat?' active':'');
+    btn.textContent=cat;
+    btn.onclick=()=>{odmCat=cat;renderOdmCatBar();startOdmiana();};
+    bar.appendChild(btn);
+  });
+}
+
+function renderOdmTenseBar(){
+  const bar=document.getElementById('odm-tense-bar');
+  bar.innerHTML='';
+  ODM_TENSES.forEach(t=>{
+    const btn=document.createElement('button');
+    btn.className='cat-pill'+(odmTenses.has(t.key)?' active':'');
+    btn.textContent=t.label;
+    btn.onclick=()=>{
+      if(odmTenses.has(t.key)){if(odmTenses.size>1)odmTenses.delete(t.key);}
+      else odmTenses.add(t.key);
+      renderOdmTenseBar();startOdmiana();
+    };
+    bar.appendChild(btn);
+  });
+}
+
+function buildOdmQuestions(){
+  // zbierz wszystkie czasowniki z odmianą w wybranej kategorii
+  const ws = (odmCat==='__all__' ? data.words : data.words.filter(w=>getCats(w).includes(odmCat)))
+    .filter(w=>w.conjugation && Object.keys(w.conjugation).length);
+  const questions=[];
+  ws.forEach(w=>{
+    ODM_TENSES.forEach(t=>{
+      if(!odmTenses.has(t.key))return;
+      const forms=w.conjugation[t.key];
+      if(!forms||!forms.length)return;
+      forms.forEach((form,pi)=>{
+        if(!form)return;
+        questions.push({word:w, tense:t.key, tenseLabel:t.label, personIdx:pi, correct:form});
+      });
+    });
+  });
+  return questions.sort(()=>Math.random()-.5);
+}
+
+function startOdmiana(){
+  renderOdmCatBar();
+  renderOdmTenseBar();
+  const empty=document.getElementById('odm-empty');
+  const main=document.getElementById('odmiana-main');
+  const result=document.getElementById('odmiana-result');
+  result.style.display='none'; main.style.display='';
+
+  odmQuestions=buildOdmQuestions();
+  if(odmQuestions.length<4){empty.style.display='flex';main.style.display='none';return;}
+  empty.style.display='none';
+  odmIdx=0;odmCorrect=0;
+  renderOdm();
+}
+
+function renderOdm(){
+  if(odmIdx>=odmQuestions.length){
+    document.getElementById('odmiana-main').style.display='none';
+    const r=document.getElementById('odmiana-result');r.style.display='flex';
+    const p=Math.round((odmCorrect/odmQuestions.length)*100);
+    document.getElementById('odm-score').textContent=odmCorrect+'/'+odmQuestions.length;
+    document.getElementById('odm-label').textContent=p+'% — '+(p>=80?'Świetnie!':p>=50?'Nieźle!':'Ćwicz dalej!');
+    return;
+  }
+  document.getElementById('odm-prog').style.width=((odmIdx/odmQuestions.length)*100)+'%';
+  const q=odmQuestions[odmIdx];
+  document.getElementById('odm-tense-label').textContent=q.tenseLabel.toUpperCase();
+  document.getElementById('odm-person-label').textContent=ODM_PERSONS[q.personIdx]||'';
+  document.getElementById('odm-verb').textContent=q.word.pl+' ('+q.word.es+')';
+
+  // dystraktorzy: inne formy tego samego czasownika + formy innych czasowników
+  const distractors=new Set();
+  // inne osoby tego samego czasu
+  const sameTenseForms=q.word.conjugation[q.tense]||[];
+  sameTenseForms.forEach((f,i)=>{if(i!==q.personIdx&&f&&f!==q.correct)distractors.add(f);});
+  // formy z innych czasowników
+  odmQuestions.forEach(oq=>{if(oq.correct!==q.correct)distractors.add(oq.correct);});
+  const dis=[...distractors].sort(()=>Math.random()-.5).slice(0,3);
+  const opts=[...dis,q.correct].sort(()=>Math.random()-.5);
+
+  const grid=document.getElementById('odm-opts');
+  grid.innerHTML='';
+  opts.forEach(opt=>{
+    const b=document.createElement('button');
+    b.className='opt';b.textContent=opt;
+    b.onclick=()=>{
+      if(b.disabled)return;
+      grid.querySelectorAll('.opt').forEach(x=>{x.disabled=true;if(x.textContent===q.correct)x.classList.add('correct');});
+      if(opt===q.correct){odmCorrect++;b.classList.add('correct');}else b.classList.add('wrong');
+      document.getElementById('odm-next').style.display='block';
+    };
+    grid.appendChild(b);
+  });
+  document.getElementById('odm-next').style.display='none';
+}
+function nextOdm(){odmIdx++;renderOdm();}
+
 function switchGra(name){
-  ['quizpl','quizes','przezyj','napisz','pary'].forEach(n=>{
+  ['quizpl','quizes','przezyj','napisz','pary','odmiana'].forEach(n=>{
     document.getElementById('gtab-'+n).classList.toggle('active',n===name);
     document.getElementById('gsub-'+n).classList.toggle('active',n===name);
   });
@@ -841,6 +973,7 @@ function switchGra(name){
   if(name==='przezyj')startPrzezyj();
   if(name==='napisz')startNapisz();
   if(name==='pary')startPary();
+  if(name==='odmiana')startOdmiana();
 }
 
 document.getElementById('inp-pl').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('inp-es').focus();});
