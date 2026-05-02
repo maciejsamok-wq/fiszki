@@ -937,20 +937,22 @@ async function loadPobierzList(){
   const loading=document.getElementById('pobierz-loading');
   const error=document.getElementById('pobierz-error');
   list.innerHTML=''; loading.style.display='flex'; error.style.display='none';
+  const downloaded = JSON.parse(localStorage.getItem('fiszki-pobrane')||'[]');
   try {
     const res=await fetch(PACZKI_INDEX+'?t='+Date.now(), {cache: 'no-store'});
     if(!res.ok) throw new Error('HTTP '+res.status);
     const paczki=await res.json();
     loading.style.display='none';
     paczki.forEach(p=>{
+      const alreadyDone = downloaded.includes(p.id);
       const el=document.createElement('div'); el.className='pobierz-item';
-      el.innerHTML=`<div class="pobierz-info"><div class="pobierz-name">${p.name}</div><div class="pobierz-meta">${p.count} słówek · ${p.category}</div></div><button class="pobierz-btn" onclick="pobierzPaczke('${p.file}',this)">Pobierz</button>`;
+      el.innerHTML=`<div class="pobierz-info"><div class="pobierz-name">${p.name}</div><div class="pobierz-meta">${p.count} słówek · ${p.category}</div></div><button class="pobierz-btn${alreadyDone?' done':''}" ${alreadyDone?'disabled':''} onclick="pobierzPaczke('${p.file}','${p.id}',this)">${alreadyDone?'✓ Pobrano':'Pobierz'}</button>`;
       list.appendChild(el);
     });
   } catch(e) { loading.style.display='none'; error.style.display='flex'; document.getElementById('pobierz-error').textContent='Błąd: '+e.message; }
 }
 
-async function pobierzPaczke(file,btn){
+async function pobierzPaczke(file,id,btn){
   btn.disabled=true; btn.textContent='...';
   try {
     const url=`https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/paczki/${file}?t=${Date.now()}`;
@@ -965,6 +967,10 @@ async function pobierzPaczke(file,btn){
       data.words.push(w); added++;
     });
     save(); renderAll();
+    // zapamiętaj że ta paczka została pobrana
+    const downloaded = JSON.parse(localStorage.getItem('fiszki-pobrane')||'[]');
+    if(!downloaded.includes(id)) downloaded.push(id);
+    localStorage.setItem('fiszki-pobrane', JSON.stringify(downloaded));
     btn.textContent='✓ Pobrano'; btn.classList.add('done'); btn.disabled=true;
     alert(dupes>0?`Dodano ${added} słówek.\nUwaga: zauważono ${dupes} potencjalnych duplikatów.`:`Dodano ${added} słówek!`);
   } catch(e) { btn.disabled=false; btn.textContent='Pobierz'; alert('Błąd pobierania. Sprawdź połączenie.'); }
