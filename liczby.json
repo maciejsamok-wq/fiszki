@@ -1,0 +1,17 @@
+{
+  "cats": ["Kolory"],
+  "words": [
+    {"pl":"czerwony","es":"rojo","cat":["Kolory","Przymiotniki"]},
+    {"pl":"niebieski","es":"azul","cat":["Kolory","Przymiotniki"]},
+    {"pl":"zielony","es":"verde","cat":["Kolory","Przymiotniki"]},
+    {"pl":"żółty","es":"amarillo","cat":["Kolory","Przymiotniki"]},
+    {"pl":"czarny","es":"negro","cat":["Kolory","Przymiotniki"]},
+    {"pl":"biały","es":"blanco","cat":["Kolory","Przymiotniki"]},
+    {"pl":"różowy","es":"rosa","cat":["Kolory","Przymiotniki"]},
+    {"pl":"pomarańczowy","es":"naranja","cat":["Kolory","Przymiotniki"]},
+    {"pl":"fioletowy","es":"morado","cat":["Kolory","Przymiotniki"]},
+    {"pl":"szary","es":"gris","cat":["Kolory","Przymiotniki"]},
+    {"pl":"brązowy","es":"marrón","cat":["Kolory","Przymiotniki"]},
+    {"pl":"złoty","es":"dorado","cat":["Kolory","Przymiotniki"]}
+  ]
+}
