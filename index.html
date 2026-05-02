@@ -938,7 +938,7 @@ async function loadPobierzList(){
   const error=document.getElementById('pobierz-error');
   list.innerHTML=''; loading.style.display='flex'; error.style.display='none';
   try {
-    const res=await fetch(PACZKI_INDEX+'?t='+Date.now());
+    const res=await fetch(PACZKI_INDEX+'?t='+Date.now(), {cache: 'no-store'});
     if(!res.ok) throw new Error('HTTP '+res.status);
     const paczki=await res.json();
     loading.style.display='none';
@@ -981,7 +981,7 @@ function switchTab(name){
   if(name==='slowka'){
     window._detailFromCat=null;
     detailIdx=-1;
-    ['wybor-slowka','wszystkie','detail','kategorie','dodaj','cat-detail'].forEach(n=>{
+    ['wybor-slowka','wszystkie','detail','kategorie','dodaj','cat-detail','pobierz'].forEach(n=>{
       const s=document.getElementById('sub-'+n);
       if(s) s.classList.toggle('active',n==='wybor-slowka');
     });
