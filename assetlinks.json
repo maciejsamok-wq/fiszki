@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.maciejsamok_wq.twa",
+        "sha256_cert_fingerprints": ["42:5D:8C:36:68:60:2F:F1:B4:7E:73:89:D7:41:63:11:01:8D:C3:EB:22:67:26:DC:0B:42:62:07:50:E0:A5:E6"]
+      }
+    }]
