@@ -205,7 +205,10 @@
 <body>
 
 <div class="header">
-  <div class="header-title">Fiszki <span>ES</span></div>
+  <div>
+    <div class="header-title">Fiszki <span>ES</span></div>
+    <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:2px">v1.7</div>
+  </div>
   <div class="hbadge" id="hcount">0 słówek</div>
 </div>
 
@@ -299,6 +302,22 @@
       <div class="show-learned-row" style="margin-bottom:16px">
         <button class="toggle-btn on" id="odm-hint-btn" onclick="toggleOdmHint()"></button>
         <span class="toggle-lbl">Podpowiedź (forma ES)</span>
+      </div>
+    </div>
+    <div id="config-pairs-section" style="display:none">
+      <div class="sec-lbl" style="margin-bottom:8px">LICZBA PAR</div>
+      <div class="cat-bar" style="margin-bottom:16px">
+        <button class="cat-pill" id="pairs-btn-6" onclick="setPairsCount(6)">6 par</button>
+        <button class="cat-pill active" id="pairs-btn-8" onclick="setPairsCount(8)">8 par</button>
+        <button class="cat-pill" id="pairs-btn-10" onclick="setPairsCount(10)">10 par</button>
+      </div>
+    </div>
+    <div id="config-opts-section" style="display:none">
+      <div class="sec-lbl" style="margin-bottom:8px">LICZBA ODPOWIEDZI</div>
+      <div class="cat-bar" style="margin-bottom:16px">
+        <button class="cat-pill active" id="opts-btn-4" onclick="setOptsCount(4)">4 opcje</button>
+        <button class="cat-pill" id="opts-btn-6" onclick="setOptsCount(6)">6 opcji</button>
+        <button class="cat-pill" id="opts-btn-8" onclick="setOptsCount(8)">8 opcji</button>
       </div>
     </div>
     <button class="primary-btn" id="config-start-btn" onclick="launchGra()">Zagraj &#8594;</button>
@@ -412,7 +431,7 @@
     <div id="odmiana-main">
       <div class="quiz-q">
         <div class="quiz-q-lang" id="odm-tense-label">PRESENTE</div>
-        <div style="font-size:13px;color:var(--muted);margin-bottom:6px" id="odm-person-label">yo</div>
+        <div style="font-size:17px;font-weight:600;color:var(--text);margin-bottom:6px" id="odm-person-label">yo</div>
         <div class="quiz-q-word" id="odm-verb">--</div>
       </div>
       <div class="opts" id="odm-opts"></div>
@@ -750,8 +769,10 @@ function renderP(){
   document.getElementById('p-prog').style.width=((pIdx/pOrder.length)*100)+'%';
   const w=pWords[pOrder[pIdx]];
   document.getElementById('p-word').textContent=w.pl;
-  const dis=pWords.filter((_,i)=>i!==pOrder[pIdx]).sort(()=>Math.random()-.5).slice(0,3);
-  buildOpts(document.getElementById('p-opts'),[...dis,w].sort(()=>Math.random()-.5),w,'es',(ok)=>{
+  const pOptsGrid = document.getElementById('p-opts');
+  pOptsGrid.style.gridTemplateColumns = '1fr 1fr';
+  const dis=pWords.filter((_,i)=>i!==pOrder[pIdx]).sort(()=>Math.random()-.5).slice(0,optsCount-1);
+  buildOpts(pOptsGrid,[...dis,w].sort(()=>Math.random()-.5),w,'es',(ok)=>{
     srUpdate(w,ok);
     if(ok){pScore++;}
     else{pLives--;renderLives();if(pLives<=0){setTimeout(()=>endPrzezyj(false,pScore),900);return;}}
@@ -828,7 +849,7 @@ function nextNapisz(){napIdx++;renderNapisz();}
 let parSelected=null,parMatched=0,parTotal=0,parMoves=0;
 function startPary(){
   const all=fw(parCat,false);
-  const ws=all.sort(()=>Math.random()-.5).slice(0,8);
+  const ws=all.sort(()=>Math.random()-.5).slice(0,pairsCount);
   const empty=document.getElementById('par-empty'),grid=document.getElementById('par-grid'),result=document.getElementById('pary-result');
   result.style.display='none';grid.style.display='';
   if(all.length<4){empty.style.display='flex';grid.style.display='none';return;}
@@ -1024,29 +1045,54 @@ function nextOdm(){odmIdx++;renderOdm();}
 // GRA CONFIG
 let currentGra = null;
 let configCat = '__all__';
+let pairsCount = 8;
+let optsCount = 4;
 
 function openGraConfig(name){
   currentGra = name;
   configCat = '__all__';
 
-  // tytuł
   const titles = {quizpl:'Quiz PL→ES',quizes:'Quiz ES→PL',przezyj:'Przeżyj',napisz:'Napisz',pary:'Pary',odmiana:'Odmiana wybór'};
   document.getElementById('config-title').textContent = titles[name] || name;
 
-  // pasek kategorii
   renderConfigCatBar();
 
-  // czasy tylko dla odmiany
   const tenseSec = document.getElementById('config-tenses-section');
+  const pairsSec = document.getElementById('config-pairs-section');
+  const optsSec = document.getElementById('config-opts-section');
+
+  tenseSec.style.display = 'none';
+  pairsSec.style.display = 'none';
+  optsSec.style.display = 'none';
+
   if(name === 'odmiana'){
     tenseSec.style.display = '';
     renderConfigTenseBar();
-  } else {
-    tenseSec.style.display = 'none';
+  } else if(name === 'pary'){
+    pairsSec.style.display = '';
+    setPairsCount(pairsCount);
+  } else if(name === 'przezyj'){
+    optsSec.style.display = '';
+    setOptsCount(optsCount);
   }
 
-  // pokaż ekran konfiguracji
   showGsub('config');
+}
+
+function setPairsCount(n){
+  pairsCount = n;
+  [6,8,10].forEach(v => {
+    const btn = document.getElementById('pairs-btn-'+v);
+    if(btn) btn.classList.toggle('active', v === n);
+  });
+}
+
+function setOptsCount(n){
+  optsCount = n;
+  [4,6,8].forEach(v => {
+    const btn = document.getElementById('opts-btn-'+v);
+    if(btn) btn.classList.toggle('active', v === n);
+  });
 }
 
 function renderConfigCatBar(){
