@@ -946,7 +946,11 @@ async function loadPobierzList(){
     paczki.forEach(p=>{
       const alreadyDone = downloaded.includes(p.id);
       const el=document.createElement('div'); el.className='pobierz-item';
-      el.innerHTML=`<div class="pobierz-info"><div class="pobierz-name">${p.name}</div><div class="pobierz-meta">${p.count} słówek · ${p.category}</div></div><button class="pobierz-btn${alreadyDone?' done':''}" ${alreadyDone?'disabled':''} onclick="pobierzPaczke('${p.file}','${p.id}',this)">${alreadyDone?'✓ Pobrano':'Pobierz'}</button>`;
+      el.innerHTML=`<div class="pobierz-info"><div class="pobierz-name">${p.name}</div><div class="pobierz-meta">${p.count} słówek · ${p.category}</div></div>
+        <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0">
+          ${alreadyDone ? '<span class="pobierz-btn done" style="text-align:center;cursor:default">✓ Pobrano</span>' : ''}
+          <button class="pobierz-btn" onclick="pobierzPaczke('${p.file}','${p.id}',this)">${alreadyDone ? 'Pobierz ponownie' : 'Pobierz'}</button>
+        </div>`;
       list.appendChild(el);
     });
   } catch(e) { loading.style.display='none'; error.style.display='flex'; document.getElementById('pobierz-error').textContent='Błąd: '+e.message; }
