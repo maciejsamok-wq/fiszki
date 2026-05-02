@@ -47,6 +47,8 @@
     .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:var(--radius);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;border:1px solid var(--border)}
     .face-front{background:var(--surface);transform:rotateY(0deg)}
     .face-back{background:var(--surface2);transform:rotateY(180deg)}
+    .face-back .face-word, .face-back .face-lang{opacity:0;transition:opacity 0s}
+    .card.flipped .face-back .face-word, .card.flipped .face-back .face-lang{opacity:1;transition:opacity 0s .24s}
     .face-lang{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.1em;color:var(--accent);margin-bottom:10px}
     .face-word{font-size:34px;font-weight:600;text-align:center;line-height:1.1;letter-spacing:-.3px}
     .face-cat{font-size:12px;color:var(--muted);margin-top:10px}
