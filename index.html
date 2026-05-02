@@ -446,7 +446,13 @@
   </div>
 
   <div class="subscreen" id="sub-detail">
-    <button class="detail-back" onclick="closeDetail()">&#8592; Wszystkie słówka</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-shrink:0">
+      <button class="detail-back" style="padding:0" onclick="closeDetail()">&#8592; Wszystkie słówka</button>
+      <div style="display:flex;gap:8px">
+        <button class="nav-btn" style="padding:6px 12px;font-size:16px" onclick="navigateDetail(-1)">&#8592;</button>
+        <button class="nav-btn" style="padding:6px 12px;font-size:16px" onclick="navigateDetail(1)">&#8594;</button>
+      </div>
+    </div>
     <div class="detail-card">
       <div class="detail-pl" id="d-pl"></div>
       <div class="detail-es" id="d-es"></div>
@@ -1112,6 +1118,50 @@ document.getElementById('inp-cat').addEventListener('keydown',e=>{if(e.key==='En
 document.getElementById('nap-inp').addEventListener('keydown',e=>{if(e.key==='Enter')checkNapisz();});
 
 let showLearned=false,detailIdx=-1;
+
+// Swipe na karcie słówka
+(function(){
+  let startX=0,startY=0;
+  const el=()=>document.getElementById('sub-detail');
+  document.addEventListener('touchstart',e=>{
+    if(!el().classList.contains('active'))return;
+    startX=e.touches[0].clientX;
+    startY=e.touches[0].clientY;
+  },{passive:true});
+  document.addEventListener('touchend',e=>{
+    if(!el().classList.contains('active'))return;
+    const dx=e.changedTouches[0].clientX-startX;
+    const dy=e.changedTouches[0].clientY-startY;
+    if(Math.abs(dx)<50||Math.abs(dx)<Math.abs(dy)*1.5)return; // za mały ruch lub bardziej pionowy
+    navigateDetail(dx<0?1:-1);
+  },{passive:true});
+})();
+
+function getDetailList(){
+  // zwróć listę indeksów słówek w aktualnym kontekście
+  if(window._detailFromCat){
+    return data.words
+      .map((w,i)=>i)
+      .filter(i=>getCats(data.words[i]).includes(window._detailFromCat));
+  }
+  const ws=showLearned?data.words:data.words.filter(w=>!w.learned);
+  return ws.map(w=>data.words.indexOf(w));
+}
+
+function navigateDetail(dir){
+  const list=getDetailList();
+  const pos=list.indexOf(detailIdx);
+  if(pos===-1)return;
+  const newPos=(pos+dir+list.length)%list.length;
+  openDetail(list[newPos]);
+  // przywróć kontekst jeśli przyszliśmy z kategorii
+  if(window._detailFromCat){
+    const fromCat=window._detailFromCat;
+    const backBtn=document.querySelector('#sub-detail .detail-back');
+    if(backBtn){backBtn.textContent='← '+fromCat;backBtn.onclick=()=>{window._detailFromCat=null;openCatDetail(fromCat);};}
+    window._detailFromCat=fromCat;
+  }
+}
 
 load();
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
