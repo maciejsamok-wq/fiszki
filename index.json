@@ -1,0 +1,25 @@
+{
+  "cats": ["Liczby"],
+  "words": [
+    {"pl":"jeden","es":"uno","cat":"Liczby"},
+    {"pl":"dwa","es":"dos","cat":"Liczby"},
+    {"pl":"trzy","es":"tres","cat":"Liczby"},
+    {"pl":"cztery","es":"cuatro","cat":"Liczby"},
+    {"pl":"pięć","es":"cinco","cat":"Liczby"},
+    {"pl":"sześć","es":"seis","cat":"Liczby"},
+    {"pl":"siedem","es":"siete","cat":"Liczby"},
+    {"pl":"osiem","es":"ocho","cat":"Liczby"},
+    {"pl":"dziewięć","es":"nueve","cat":"Liczby"},
+    {"pl":"dziesięć","es":"diez","cat":"Liczby"},
+    {"pl":"jedenaście","es":"once","cat":"Liczby"},
+    {"pl":"dwanaście","es":"doce","cat":"Liczby"},
+    {"pl":"trzynaście","es":"trece","cat":"Liczby"},
+    {"pl":"czternaście","es":"catorce","cat":"Liczby"},
+    {"pl":"piętnaście","es":"quince","cat":"Liczby"},
+    {"pl":"szesnaście","es":"dieciséis","cat":"Liczby"},
+    {"pl":"siedemnaście","es":"diecisiete","cat":"Liczby"},
+    {"pl":"osiemnaście","es":"dieciocho","cat":"Liczby"},
+    {"pl":"dziewiętnaście","es":"diecinueve","cat":"Liczby"},
+    {"pl":"dwadzieścia","es":"veinte","cat":"Liczby"}
+  ]
+}
