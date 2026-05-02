@@ -947,7 +947,7 @@ async function loadPobierzList(){
       el.innerHTML=`<div class="pobierz-info"><div class="pobierz-name">${p.name}</div><div class="pobierz-meta">${p.count} słówek · ${p.category}</div></div><button class="pobierz-btn" onclick="pobierzPaczke('${p.file}',this)">Pobierz</button>`;
       list.appendChild(el);
     });
-  } catch(e) { loading.style.display='none'; error.style.display='flex'; }
+  } catch(e) { loading.style.display='none'; error.style.display='flex'; document.getElementById('pobierz-error').textContent='Błąd: '+e.message; }
 }
 
 async function pobierzPaczke(file,btn){
