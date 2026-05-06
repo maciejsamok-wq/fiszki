@@ -2,7 +2,7 @@
   {
     "id": "kolory",
     "name": "Kolory",
-    "category": "Przymiotniki, Kolory",
+    "category": "Kolory",
     "count": 12,
     "file": "kolory.json"
   },
@@ -12,5 +12,13 @@
     "category": "Liczby",
     "count": 20,
     "file": "liczby.json"
+  },
+  {
+    "id": "espanol_28_04",
+    "name": "Lekcja 28.04",
+    "category": "Espanol 28.04",
+    "count": 84,
+    "file": "espanol_28_04.json"
   }
 ]
+
